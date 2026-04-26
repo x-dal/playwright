@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Test Report – test 1</title>
+<style>
+  body { font-family: system-ui; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+  h1 { color: #38bdf8; }
+  .badge { display:inline-block; padding:.2rem .6rem; border-radius:9999px; font-size:.8rem; font-weight:600; }
+  .passed { background:#16a34a; } .failed { background:#dc2626; }
+  table { width:100%; border-collapse:collapse; margin-top:1rem; }
+  th,td { padding:.75rem 1rem; text-align:left; border-bottom:1px solid #334155; }
+  th { background:#1e293b; }
+  details summary { cursor:pointer; color:#94a3b8; }
+  pre { background:#1e293b; padding:1rem; border-radius:.5rem; overflow:auto; font-size:.8rem; }
+</style>
+</head>
+<body>
+<h1>test 1 – Test Report</h1>
+<p>Run ID: <code>3c2fa015-fe15-4fff-a9ab-7d1be10649a4</code> &nbsp;|&nbsp; Started: 2026-04-25T21:26:41.125Z &nbsp;|&nbsp; Completed: 2026-04-25T21:26:42.889Z</p>
+<p><span class="badge passed">0 passed</span> &nbsp;<span class="badge failed">1 failed</span></p>
+<table>
+  <thead><tr><th>Test</th><th>Browser</th><th>Status</th><th>Duration</th><th>Logs</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>test1</td>
+      <td>chromium</td>
+      <td><span class="badge failed">failed</span></td>
+      <td>1.15s</td>
+      <td><details><summary>3 lines</summary><pre>Step: Navigate to https://www.google.com/
+Step: Click 'button', { name: 'Accept all' }
+FAILED: locator.click: Unsupported token "{" while parsing css selector "'button', { name: 'Accept all' }". Did you mean to CSS.escape it?
+Call log:
+[2m  - waiting for 'button', { name: 'Accept all' }[22m
+</pre></details></td>
+    </tr>
+  </tbody>
+</table>
+</body></html>

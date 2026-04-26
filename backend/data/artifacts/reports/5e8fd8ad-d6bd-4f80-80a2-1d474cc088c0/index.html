@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Test Report – test 1</title>
+<style>
+  body { font-family: system-ui; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+  h1 { color: #38bdf8; }
+  .badge { display:inline-block; padding:.2rem .6rem; border-radius:9999px; font-size:.8rem; font-weight:600; }
+  .passed { background:#16a34a; } .failed { background:#dc2626; }
+  table { width:100%; border-collapse:collapse; margin-top:1rem; }
+  th,td { padding:.75rem 1rem; text-align:left; border-bottom:1px solid #334155; }
+  th { background:#1e293b; }
+  details summary { cursor:pointer; color:#94a3b8; }
+  pre { background:#1e293b; padding:1rem; border-radius:.5rem; overflow:auto; font-size:.8rem; }
+</style>
+</head>
+<body>
+<h1>test 1 – Test Report</h1>
+<p>Run ID: <code>5e8fd8ad-d6bd-4f80-80a2-1d474cc088c0</code> &nbsp;|&nbsp; Started: 2026-04-25T22:08:39.579Z &nbsp;|&nbsp; Completed: 2026-04-25T22:09:11.934Z</p>
+<p><span class="badge passed">0 passed</span> &nbsp;<span class="badge failed">1 failed</span></p>
+<table>
+  <thead><tr><th>Test</th><th>Browser</th><th>Status</th><th>Duration</th><th>Logs</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>33</td>
+      <td>chromium</td>
+      <td><span class="badge failed">failed</span></td>
+      <td>32.01s</td>
+      <td><details><summary>9 lines</summary><pre>Step: Navigate to https://pub.dev/
+[error] Connecting to 'https://www.gstatic.com/intl/en/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Connecting to 'https://www.gstatic.com/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+Step: Click [searchbox] "Search"
+Step: Type into [searchbox] "Search"
+[error] Connecting to 'https://region1.google-analytics.com/g/collect?v=2&tid=G-14NWFE7R74&gtm=45je64m2v9121760518za20g&_p=1777154920259&gcd=13l3l3l2l3l1&npa=1&dma_cps=a&dma=1&_eu=ABAI&_geo=1&_rdi=1&are=1&cid=638827829.1777154921&frm=0&pscdl=noapi&rcb=5&ul=en-us&_s=1&tag_exp=0~115938465~115938468~117266401~117512542&dl=https%3A%2F%2Fpub.dev%2F&dt=The%20official%20repository%20for%20Dart%20and%20Flutter%20packages.&sid=1777154920&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=0~115616986~115938465~115938468~117266401~118167058&tfd=920' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Fetch API cannot load https://region1.google-analytics.com/g/collect?v=2&tid=G-14NWFE7R74&gtm=45je64m2v9121760518za20g&_p=1777154920259&gcd=13l3l3l2l3l1&npa=1&dma_cps=a&dma=1&_eu=ABAI&_geo=1&_rdi=1&are=1&cid=638827829.1777154921&frm=0&pscdl=noapi&rcb=5&ul=en-us&_s=1&tag_exp=0~115938465~115938468~117266401~117512542&dl=https%3A%2F%2Fpub.dev%2F&dt=The%20official%20repository%20for%20Dart%20and%20Flutter%20packages.&sid=1777154920&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=0~115616986~115938465~115938468~117266401~118167058&tfd=920. Refused to connect because it violates the document's Content Security Policy.
+Step: Click [link] "get"
+FAILED: locator.click: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('link', { name: 'get', exact: true })[22m
+</pre></details></td>
+    </tr>
+  </tbody>
+</table>
+</body></html>

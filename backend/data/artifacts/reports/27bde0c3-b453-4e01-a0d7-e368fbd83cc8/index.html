@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Test Report – test axis.com</title>
+<style>
+  body { font-family: system-ui; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+  h1 { color: #38bdf8; }
+  .badge { display:inline-block; padding:.2rem .6rem; border-radius:9999px; font-size:.8rem; font-weight:600; }
+  .passed { background:#16a34a; } .failed { background:#dc2626; }
+  table { width:100%; border-collapse:collapse; margin-top:1rem; }
+  th,td { padding:.75rem 1rem; text-align:left; border-bottom:1px solid #334155; }
+  th { background:#1e293b; }
+  details summary { cursor:pointer; color:#94a3b8; }
+  pre { background:#1e293b; padding:1rem; border-radius:.5rem; overflow:auto; font-size:.8rem; }
+</style>
+</head>
+<body>
+<h1>test axis.com – Test Report</h1>
+<p>Run ID: <code>27bde0c3-b453-4e01-a0d7-e368fbd83cc8</code> &nbsp;|&nbsp; Started: 2026-04-25T22:49:02.195Z &nbsp;|&nbsp; Completed: 2026-04-25T22:49:40.806Z</p>
+<p><span class="badge passed">1 passed</span> &nbsp;<span class="badge failed">1 failed</span></p>
+<table>
+  <thead><tr><th>Test</th><th>Browser</th><th>Status</th><th>Duration</th><th>Logs</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>test axis.com</td>
+      <td>chromium</td>
+      <td><span class="badge passed">passed</span></td>
+      <td>2.99s</td>
+      <td><details><summary>6 lines</summary><pre>Step: Navigate to https://www.axis.com/
+Step: Click [button] "Accept all"
+Step: Click [link] "Learning organization"
+[warning] [.WebGL-0x13c017eb600]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[warning] Hotjar not launching due to suspicious userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36
+[warning] [.WebGL-0x13c017f1c00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels</pre></details></td>
+    </tr><tr>
+      <td>https://www.axis.com/product</td>
+      <td>chromium</td>
+      <td><span class="badge failed">failed</span></td>
+      <td>34.98s</td>
+      <td><details><summary>8 lines</summary><pre>Step: Navigate to https://www.axis.com/
+Step: Click [button] "Accept all"
+Step: Click [link] "Products"
+Step: Click [link] "Products"
+Step: Click [link] "Products"
+Step: Click text:"Network intercoms .cls-1{fill"
+[warning] Hotjar not launching due to suspicious userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/147.0.7727.15 Safari/537.36
+FAILED: locator.click: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByText('Network intercoms .cls-1{fill')[22m
+[2m    - locator resolved to <div class="main-menu__depth-1-links">…</div>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not visible[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not visible[22m
+[2m    - retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m    57 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is not visible[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+</pre></details></td>
+    </tr>
+  </tbody>
+</table>
+</body></html>

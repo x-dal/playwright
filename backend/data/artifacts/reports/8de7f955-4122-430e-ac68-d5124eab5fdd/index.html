@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Test Report – test 1</title>
+<style>
+  body { font-family: system-ui; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+  h1 { color: #38bdf8; }
+  .badge { display:inline-block; padding:.2rem .6rem; border-radius:9999px; font-size:.8rem; font-weight:600; }
+  .passed { background:#16a34a; } .failed { background:#dc2626; }
+  table { width:100%; border-collapse:collapse; margin-top:1rem; }
+  th,td { padding:.75rem 1rem; text-align:left; border-bottom:1px solid #334155; }
+  th { background:#1e293b; }
+  details summary { cursor:pointer; color:#94a3b8; }
+  pre { background:#1e293b; padding:1rem; border-radius:.5rem; overflow:auto; font-size:.8rem; }
+</style>
+</head>
+<body>
+<h1>test 1 – Test Report</h1>
+<p>Run ID: <code>8de7f955-4122-430e-ac68-d5124eab5fdd</code> &nbsp;|&nbsp; Started: 2026-04-25T22:07:36.285Z &nbsp;|&nbsp; Completed: 2026-04-25T22:08:11.880Z</p>
+<p><span class="badge passed">0 passed</span> &nbsp;<span class="badge failed">3 failed</span></p>
+<table>
+  <thead><tr><th>Test</th><th>Browser</th><th>Status</th><th>Duration</th><th>Logs</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>test1</td>
+      <td>chromium</td>
+      <td><span class="badge failed">failed</span></td>
+      <td>1.14s</td>
+      <td><details><summary>3 lines</summary><pre>Step: Navigate to https://www.google.com/
+Step: Click 'button', { name: 'Accept all' }
+FAILED: locator.click: Unsupported token "{" while parsing css selector "'button', { name: 'Accept all' }". Did you mean to CSS.escape it?
+Call log:
+[2m  - waiting for 'button', { name: 'Accept all' }[22m
+</pre></details></td>
+    </tr><tr>
+      <td>test 2</td>
+      <td>chromium</td>
+      <td><span class="badge failed">failed</span></td>
+      <td>1.80s</td>
+      <td><details><summary>7 lines</summary><pre>Step: Navigate to https://pub.dev/
+[error] Connecting to 'https://www.gstatic.com/intl/en/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Connecting to 'https://www.gstatic.com/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+Step: Click 'searchbox', { name: 'Search' }
+FAILED: locator.click: Unsupported token "{" while parsing css selector "'searchbox', { name: 'Search' }". Did you mean to CSS.escape it?
+Call log:
+[2m  - waiting for 'searchbox', { name: 'Search' }[22m
+
+[error] Connecting to 'https://region1.google-analytics.com/g/collect?v=2&tid=G-14NWFE7R74&gtm=45je64m2v9121760518za20g&_p=1777154858303&gcd=13l3l3l2l3l1&npa=1&dma_cps=a&dma=1&_eu=ABAI&_geo=1&_rdi=1&are=1&cid=788133656.1777154859&frm=0&pscdl=noapi&rcb=16&ul=en-us&_s=1&tag_exp=0~115938466~115938468~117266400~117512543~117884344~118289195~118463261&dl=https%3A%2F%2Fpub.dev%2F&dt=The%20official%20repository%20for%20Dart%20and%20Flutter%20packages.&sid=1777154859&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=0~115938466~115938468~117266401~117384406~118167060~118289195~118463261&tfd=1064' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Fetch API cannot load https://region1.google-analytics.com/g/collect?v=2&tid=G-14NWFE7R74&gtm=45je64m2v9121760518za20g&_p=1777154858303&gcd=13l3l3l2l3l1&npa=1&dma_cps=a&dma=1&_eu=ABAI&_geo=1&_rdi=1&are=1&cid=788133656.1777154859&frm=0&pscdl=noapi&rcb=16&ul=en-us&_s=1&tag_exp=0~115938466~115938468~117266400~117512543~117884344~118289195~118463261&dl=https%3A%2F%2Fpub.dev%2F&dt=The%20official%20repository%20for%20Dart%20and%20Flutter%20packages.&sid=1777154859&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=0~115938466~115938468~117266401~117384406~118167060~118289195~118463261&tfd=1064. Refused to connect because it violates the document's Content Security Policy.</pre></details></td>
+    </tr><tr>
+      <td>33</td>
+      <td>chromium</td>
+      <td><span class="badge failed">failed</span></td>
+      <td>31.95s</td>
+      <td><details><summary>9 lines</summary><pre>Step: Navigate to https://pub.dev/
+[error] Connecting to 'https://www.gstatic.com/intl/en/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Connecting to 'https://www.gstatic.com/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+Step: Click [searchbox] "Search"
+Step: Type into [searchbox] "Search"
+[error] Connecting to 'https://region1.google-analytics.com/g/collect?v=2&tid=G-14NWFE7R74&gtm=45je64m2v9121760518za20g&_p=1777154860207&gcd=13l3l3l2l3l1&npa=1&dma_cps=a&dma=1&_eu=ABAI&_geo=1&_rdi=1&are=1&cid=754967098.1777154861&frm=0&pscdl=noapi&rcb=13&ul=en-us&_s=1&tag_exp=0~115938465~115938468~117266400~117512542~118167059&dl=https%3A%2F%2Fpub.dev%2F&dt=The%20official%20repository%20for%20Dart%20and%20Flutter%20packages.&sid=1777154860&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=0~115616986~115938465~115938469~117266401&tfd=912' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Fetch API cannot load https://region1.google-analytics.com/g/collect?v=2&tid=G-14NWFE7R74&gtm=45je64m2v9121760518za20g&_p=1777154860207&gcd=13l3l3l2l3l1&npa=1&dma_cps=a&dma=1&_eu=ABAI&_geo=1&_rdi=1&are=1&cid=754967098.1777154861&frm=0&pscdl=noapi&rcb=13&ul=en-us&_s=1&tag_exp=0~115938465~115938468~117266400~117512542~118167059&dl=https%3A%2F%2Fpub.dev%2F&dt=The%20official%20repository%20for%20Dart%20and%20Flutter%20packages.&sid=1777154860&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=0~115616986~115938465~115938469~117266401&tfd=912. Refused to connect because it violates the document's Content Security Policy.
+Step: Click [link] "get"
+FAILED: locator.click: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('link', { name: 'get', exact: true })[22m
+</pre></details></td>
+    </tr>
+  </tbody>
+</table>
+</body></html>

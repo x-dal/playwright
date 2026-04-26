@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Test Report – test 1</title>
+<style>
+  body { font-family: system-ui; background: #0f172a; color: #e2e8f0; padding: 2rem; }
+  h1 { color: #38bdf8; }
+  .badge { display:inline-block; padding:.2rem .6rem; border-radius:9999px; font-size:.8rem; font-weight:600; }
+  .passed { background:#16a34a; } .failed { background:#dc2626; }
+  table { width:100%; border-collapse:collapse; margin-top:1rem; }
+  th,td { padding:.75rem 1rem; text-align:left; border-bottom:1px solid #334155; }
+  th { background:#1e293b; }
+  details summary { cursor:pointer; color:#94a3b8; }
+  pre { background:#1e293b; padding:1rem; border-radius:.5rem; overflow:auto; font-size:.8rem; }
+</style>
+</head>
+<body>
+<h1>test 1 – Test Report</h1>
+<p>Run ID: <code>7af6f484-c161-4d61-9dce-21d7c94a7f1d</code> &nbsp;|&nbsp; Started: 2026-04-25T22:22:14.336Z &nbsp;|&nbsp; Completed: 2026-04-25T22:22:28.450Z</p>
+<p><span class="badge passed">2 passed</span> &nbsp;<span class="badge failed">0 failed</span></p>
+<table>
+  <thead><tr><th>Test</th><th>Browser</th><th>Status</th><th>Duration</th><th>Logs</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>https://luqma.app/</td>
+      <td>chromium</td>
+      <td><span class="badge passed">passed</span></td>
+      <td>8.48s</td>
+      <td><details><summary>42 lines</summary><pre>Step: Navigate to https://luqma.app/
+[log] [Cart] Loading from localStorage: null
+[log] [Geolocation] Detected country from ipapi.co: SE
+[log] [LandingPage] Detected country: SE
+[log] [LandingPage] Country not supported, showing availability modal: SE
+Step: Click [button] "قبول الكل"
+Step: Click [button] "🇮🇶 العراق متاح الآن"
+Step: Click [button] "تابع إلى العراق"
+Step: Click [textbox] "محمد أحمد"
+[log] [Geolocation] Using cached country: IQ
+[log] [Cart] Loading from localStorage: null
+[log] [LandingPage] Detected country: IQ
+Step: Type into [textbox] "محمد أحمد"
+Step: Click [textbox] "example@email.com"
+Step: Type into [textbox] "example@email.com"
+Step: Type into [textbox] "example@email.com"
+Step: Type into [textbox] "example@email.com"
+Step: Type into [textbox] "example@email.com"
+Step: Type into [textbox] "example@email.com"
+Step: Click [textbox] "كيف يمكننا مساعدتك؟"
+Step: Type into [textbox] "كيف يمكننا مساعدتك؟"
+Step: Click [textbox] "أخبرنا المزيد عن سؤالك أو مشكلتك"
+Step: Type into [textbox] "كيف يمكننا مساعدتك؟"
+Step: Type into [textbox] "أخبرنا المزيد عن سؤالك أو مشكلتك"
+Step: Click [button] "إرسال الرسالة"
+Step: Click text:"الموضوع*"
+Step: Click [textbox] "example@email.com"
+Step: Click [textbox] "example@email.com"
+Step: Click [textbox] "example@email.com"
+Step: Click [textbox] "example@email.com"
+Step: Type into [textbox] "example@email.com"
+Step: Click [textbox] "example@email.com"
+Step: Click [textbox] "example@email.com"
+Step: Type into [textbox] "example@email.com"
+Step: Type into [textbox] "example@email.com"
+Step: Click [button] "إرسال الرسالة"
+Step: Click [textbox] "example@email.com"
+Step: Click [textbox] "example@email.com"
+Step: Click text:"الاسم*البريد الإلكتروني*"
+Step: Click [textbox] "example@email.com"
+Step: Type into [textbox] "example@email.com"
+Step: Click [button] "إرسال الرسالة"</pre></details></td>
+    </tr><tr>
+      <td>https://pub.dev/</td>
+      <td>chromium</td>
+      <td><span class="badge passed">passed</span></td>
+      <td>4.86s</td>
+      <td><details><summary>17 lines</summary><pre>Step: Navigate to https://pub.dev/
+[error] Connecting to 'https://www.gstatic.com/intl/en/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Connecting to 'https://www.gstatic.com/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+Step: Click [searchbox] "Search"
+Step: Type into [searchbox] "Search"
+[error] Connecting to 'https://region1.google-analytics.com/g/collect?v=2&tid=G-14NWFE7R74&gtm=45je64m2v9121760518za20g&_p=1777155743836&gcd=13l3l3l2l3l1&npa=1&dma_cps=a&dma=1&_eu=ABAI&_geo=1&_rdi=1&are=1&cid=188514591.1777155744&frm=0&pscdl=noapi&rcb=10&ul=en-us&_s=1&tag_exp=0~115616986~115938466~115938469~117266401~117512543~118463261&dl=https%3A%2F%2Fpub.dev%2F&dt=The%20official%20repository%20for%20Dart%20and%20Flutter%20packages.&sid=1777155744&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=0~115938466~115938468~117266401~117384406~118463262&tfd=932' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Fetch API cannot load https://region1.google-analytics.com/g/collect?v=2&tid=G-14NWFE7R74&gtm=45je64m2v9121760518za20g&_p=1777155743836&gcd=13l3l3l2l3l1&npa=1&dma_cps=a&dma=1&_eu=ABAI&_geo=1&_rdi=1&are=1&cid=188514591.1777155744&frm=0&pscdl=noapi&rcb=10&ul=en-us&_s=1&tag_exp=0~115616986~115938466~115938469~117266401~117512543~118463261&dl=https%3A%2F%2Fpub.dev%2F&dt=The%20official%20repository%20for%20Dart%20and%20Flutter%20packages.&sid=1777155744&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&gap.uat=0~115938466~115938468~117266401~117384406~118463262&tfd=932. Refused to connect because it violates the document's Content Security Policy.
+Step: Press Enter
+Step: Click [link] "get"
+[error] Connecting to 'https://www.gstatic.com/intl/en/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Connecting to 'https://www.gstatic.com/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Connecting to 'https://region1.google-analytics.com/g/collect?v=2&tid=G-14NWFE7R74&gtm=45je64m2v9121760518za20g&_p=1777155744791&gcd=13l3l3l2l3l1&npa=1&dma_cps=a&dma=1&_eu=ABAIAAQ&_geo=1&_rdi=1&are=1&cid=188514591.1777155744&frm=0&pscdl=noapi&rcb=3&ul=en-us&_s=1&tag_exp=0~115616986~115938466~115938469~116363097~117266400~117512543~117884344~118463261&dl=https%3A%2F%2Fpub.dev%2Fpackages%3Fq%3Dgetx&dt=Search%20results%20for%20getx&sid=1777155744&sct=1&seg=1&_tu=wAQ&en=page_view&_ee=1&gap.uat=0~115938466~115938469~116363097~117266400~118128923&tfd=578' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Fetch API cannot load https://region1.google-analytics.com/g/collect?v=2&tid=G-14NWFE7R74&gtm=45je64m2v9121760518za20g&_p=1777155744791&gcd=13l3l3l2l3l1&npa=1&dma_cps=a&dma=1&_eu=ABAIAAQ&_geo=1&_rdi=1&are=1&cid=188514591.1777155744&frm=0&pscdl=noapi&rcb=3&ul=en-us&_s=1&tag_exp=0~115616986~115938466~115938469~116363097~117266400~117512543~117884344~118463261&dl=https%3A%2F%2Fpub.dev%2Fpackages%3Fq%3Dgetx&dt=Search%20results%20for%20getx&sid=1777155744&sct=1&seg=1&_tu=wAQ&en=page_view&_ee=1&gap.uat=0~115938466~115938469~116363097~117266400~118128923&tfd=578. Refused to connect because it violates the document's Content Security Policy.
+[error] Connecting to 'https://www.gstatic.com/intl/en/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+Step: Click [img] "copy "get: ^4.7.3" to"
+[error] Connecting to 'https://www.gstatic.com/brandstudio/kato/cookie_choice_component/config.json' violates the following Content Security Policy directive: "connect-src 'self' https://www.google-analytics.com/ https://stats.g.doubleclick.net/". The action has been blocked.
+[error] Framing 'https://feedback-pa.clients6.google.com/' violates the following Content Security Policy directive: "frame-src 'self' https://www.googletagmanager.com/ https://accounts.google.com/". The request has been blocked.
+</pre></details></td>
+    </tr>
+  </tbody>
+</table>
+</body></html>
