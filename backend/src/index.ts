@@ -6,6 +6,11 @@ import suitesRouter from './routes/suites';
 import runsRouter from './routes/runs';
 import recorderRouter from './routes/recorder';
 import exportRouter from './routes/export';
+import issuesRouter from './routes/issues';
+import plansRouter from './routes/plans';
+import strategiesRouter from './routes/strategies';
+import apiCollectionsRouter from './routes/api-collections';
+import requirementsRouter from './routes/requirements';
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001;
@@ -26,6 +31,11 @@ app.use('/api/suites', suitesRouter);
 app.use('/api/runs', runsRouter);
 app.use('/api/recorder', recorderRouter);
 app.use('/api/export', exportRouter);
+app.use('/api/issues', issuesRouter);
+app.use('/api/plans', plansRouter);
+app.use('/api/strategies', strategiesRouter);
+app.use('/api/collections', apiCollectionsRouter);
+app.use('/api/requirements', requirementsRouter);
 
 // ─── Health check ──────────────────────────────────────────────────────────────
 

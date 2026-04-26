@@ -134,8 +134,8 @@ export default function Recorder({ suiteId }: Props) {
   return (
     <div className="h-full overflow-y-auto p-6 max-w-3xl mx-auto">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white mb-1">Playwright Codegen Recorder</h3>
-        <p className="text-slate-400 text-sm">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Playwright Codegen Recorder</h3>
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
           Opens a real browser with Playwright's inspector. Interact with the page and your actions are captured as test steps.
         </p>
       </div>
@@ -154,7 +154,7 @@ export default function Recorder({ suiteId }: Props) {
         </div>
 
         {error && (
-          <div className="bg-red-950/40 border border-red-800 rounded-lg p-3 mb-4 text-red-300 text-sm whitespace-pre-wrap">
+          <div className="bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-4 text-red-700 dark:text-red-300 text-sm whitespace-pre-wrap">
             <span className="font-semibold">Error: </span>{error}
           </div>
         )}
@@ -170,8 +170,8 @@ export default function Recorder({ suiteId }: Props) {
             <>
               <div className="flex items-center gap-2">
                 <span className="recording-pulse text-red-500 text-lg">⏺</span>
-                <span className="text-sm font-medium text-red-400">Recording…</span>
-                <span className="text-sm text-slate-400">interact with the browser window that just opened</span>
+                <span className="text-sm font-medium text-red-600 dark:text-red-400">Recording…</span>
+                <span className="text-sm text-slate-500 dark:text-slate-400">interact with the browser window that just opened</span>
               </div>
               <button onClick={stopRecording} className="btn-danger ml-auto">
                 ⏹ Stop Recording
@@ -200,17 +200,17 @@ export default function Recorder({ suiteId }: Props) {
       {(status === 'recording' || status === 'stopped') && (
         <div className="card p-4 mb-5">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-medium text-slate-300">
+            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Captured Steps
               {status === 'recording' && (
-                <span className="text-xs text-slate-500 ml-2">(auto-updating every 2s)</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500 ml-2">(auto-updating every 2s)</span>
               )}
             </h4>
-            <span className="text-xs text-slate-500">{steps.length} steps</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500">{steps.length} steps</span>
           </div>
 
           {steps.length === 0 ? (
-            <div className="text-slate-600 text-sm text-center py-4">
+            <div className="text-slate-400 dark:text-slate-600 text-sm text-center py-4">
               {status === 'recording'
                 ? 'Interact with the browser window — steps appear here as you record'
                 : 'No steps were captured'}
@@ -218,10 +218,10 @@ export default function Recorder({ suiteId }: Props) {
           ) : (
             <div className="space-y-1 max-h-64 overflow-y-auto">
               {steps.map((step, idx) => (
-                <div key={step.id} className="flex items-center gap-3 py-1.5 px-3 rounded bg-slate-900/60 text-xs">
-                  <span className="text-slate-600 w-5 shrink-0">{idx + 1}</span>
-                  <span className="text-xs bg-slate-700 rounded px-1.5 py-0.5 text-slate-300 font-mono shrink-0">{step.type}</span>
-                  <span className="text-slate-400 truncate">{step.name}</span>
+                <div key={step.id} className="flex items-center gap-3 py-1.5 px-3 rounded bg-slate-100 dark:bg-slate-900/60 text-xs">
+                  <span className="text-slate-400 dark:text-slate-600 w-5 shrink-0">{idx + 1}</span>
+                  <span className="text-xs bg-slate-200 dark:bg-slate-700 rounded px-1.5 py-0.5 text-slate-600 dark:text-slate-300 font-mono shrink-0">{step.type}</span>
+                  <span className="text-slate-600 dark:text-slate-400 truncate">{step.name}</span>
                 </div>
               ))}
             </div>
@@ -229,10 +229,10 @@ export default function Recorder({ suiteId }: Props) {
 
           {rawCode && (
             <details className="mt-3">
-              <summary className="text-xs text-slate-500 cursor-pointer hover:text-slate-400 select-none">
+              <summary className="text-xs text-slate-500 dark:text-slate-500 cursor-pointer hover:text-slate-700 dark:hover:text-slate-400 select-none">
                 View raw Playwright code
               </summary>
-              <pre className="mt-2 text-xs font-mono bg-slate-950 rounded p-3 overflow-auto max-h-48 text-slate-300 whitespace-pre">{rawCode}</pre>
+              <pre className="mt-2 text-xs font-mono bg-slate-100 dark:bg-slate-950 rounded p-3 overflow-auto max-h-48 text-slate-700 dark:text-slate-300 whitespace-pre">{rawCode}</pre>
             </details>
           )}
         </div>
@@ -241,7 +241,7 @@ export default function Recorder({ suiteId }: Props) {
       {/* Import to test */}
       {status === 'stopped' && steps.length > 0 && (
         <div className="card p-5 mb-5">
-          <h4 className="text-sm font-medium text-white mb-3">Import Steps into Test</h4>
+          <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">Import Steps into Test</h4>
           <div className="flex gap-3">
             <div className="flex-1">
               <label className="label">Target Test</label>
@@ -266,15 +266,15 @@ export default function Recorder({ suiteId }: Props) {
               </button>
             </div>
           </div>
-          <p className="text-xs text-slate-600 mt-2">Steps are appended to the end of the selected test.</p>
+          <p className="text-xs text-slate-400 dark:text-slate-600 mt-2">Steps are appended to the end of the selected test.</p>
         </div>
       )}
 
       {/* How-to instructions */}
       {status === 'idle' && (
-        <div className="bg-slate-900/40 border border-slate-700 rounded-xl p-5 text-sm text-slate-400 space-y-3">
-          <div className="font-medium text-slate-300">How recording works</div>
-          <ol className="space-y-2 list-none">
+        <div className="bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 text-sm text-slate-600 dark:text-slate-400 space-y-4">
+          <div className="font-semibold text-slate-800 dark:text-slate-200">How recording works</div>
+          <ol className="space-y-3 list-none">
             {[
               ['1', 'Enter the URL of the page you want to test'],
               ['2', 'Click "Start Recording" — a Chromium window opens with the Playwright inspector'],
@@ -283,14 +283,14 @@ export default function Recorder({ suiteId }: Props) {
               ['5', 'Review the captured steps, then import them into any test'],
             ].map(([n, text]) => (
               <li key={n} className="flex gap-3">
-                <span className="w-5 h-5 rounded-full bg-slate-700 text-slate-400 text-xs flex items-center justify-center shrink-0 mt-0.5">{n}</span>
-                <span>{text}</span>
+                <span className="w-6 h-6 rounded-full bg-blue-100 dark:bg-slate-700 text-blue-700 dark:text-slate-300 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">{n}</span>
+                <span className="text-slate-700 dark:text-slate-300 leading-relaxed">{text}</span>
               </li>
             ))}
           </ol>
-          <div className="border-t border-slate-700 pt-3 text-xs text-slate-600">
-            <span className="text-slate-500 font-medium">Prerequisite:</span> run{' '}
-            <code className="bg-slate-800 px-1 rounded font-mono">cd backend && npx playwright install chromium</code>{' '}
+          <div className="border-t border-slate-200 dark:border-slate-700 pt-3 text-xs text-slate-500 dark:text-slate-500">
+            <span className="font-semibold text-slate-600 dark:text-slate-400">Prerequisite:</span> run{' '}
+            <code className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono">cd backend &amp;&amp; npx playwright install chromium</code>{' '}
             before using the recorder.
           </div>
         </div>

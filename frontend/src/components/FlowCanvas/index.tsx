@@ -98,10 +98,10 @@ export default function FlowCanvas() {
 
 function EmptyCanvas() {
   return (
-    <div className="flex flex-col items-center justify-center h-64 text-center border-2 border-dashed border-slate-700 rounded-xl m-4">
-      <div className="text-4xl mb-3">🎭</div>
-      <div className="text-slate-400 font-medium">Drop steps here or click + in the palette</div>
-      <div className="text-slate-600 text-sm mt-1">Build your test flow step by step</div>
+    <div className="flex flex-col items-center justify-center h-64 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl m-4">
+      <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-3xl mb-3">🎭</div>
+      <div className="text-sm font-semibold text-slate-600 dark:text-slate-400">Drop steps here</div>
+      <div className="text-xs text-slate-400 dark:text-slate-600 mt-1">or click + in the palette to add</div>
     </div>
   );
 }

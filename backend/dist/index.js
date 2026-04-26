@@ -11,6 +11,11 @@ const suites_1 = __importDefault(require("./routes/suites"));
 const runs_1 = __importDefault(require("./routes/runs"));
 const recorder_1 = __importDefault(require("./routes/recorder"));
 const export_1 = __importDefault(require("./routes/export"));
+const issues_1 = __importDefault(require("./routes/issues"));
+const plans_1 = __importDefault(require("./routes/plans"));
+const strategies_1 = __importDefault(require("./routes/strategies"));
+const api_collections_1 = __importDefault(require("./routes/api-collections"));
+const requirements_1 = __importDefault(require("./routes/requirements"));
 const app = (0, express_1.default)();
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 // ─── Middleware ────────────────────────────────────────────────────────────────
@@ -24,6 +29,11 @@ app.use('/api/suites', suites_1.default);
 app.use('/api/runs', runs_1.default);
 app.use('/api/recorder', recorder_1.default);
 app.use('/api/export', export_1.default);
+app.use('/api/issues', issues_1.default);
+app.use('/api/plans', plans_1.default);
+app.use('/api/strategies', strategies_1.default);
+app.use('/api/collections', api_collections_1.default);
+app.use('/api/requirements', requirements_1.default);
 // ─── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });

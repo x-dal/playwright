@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import type { TestSuite, Test, Step, TestRun, PageObject, TestDataSet, ExecutionOptions } from '../types';
+import type {
+  TestSuite, Test, Step, TestRun, PageObject, TestDataSet, ExecutionOptions,
+  Issue, TestPlan, TestStrategy, ApiCollection, ApiRequest, Requirement,
+} from '../types';
 import * as api from '../api/client';
 
 // tiny uuid shim since crypto.randomUUID may not exist in older Safari
@@ -16,7 +19,7 @@ interface StoreState {
   // Current editing context
   activeSuiteId: string | null;
   activeTestId: string | null;
-  activeView: 'dashboard' | 'builder' | 'runs' | 'code';
+  activeView: 'dashboard' | 'builder' | 'runs' | 'code' | 'bugs' | 'plans' | 'api-tester' | 'requirements';
 
   // Runs
   runs: TestRun[];
@@ -69,6 +72,46 @@ interface StoreState {
   setView: (view: StoreState['activeView']) => void;
   setSelectedStep: (id: string | null) => void;
   setPaletteFilter: (f: string) => void;
+
+  // Issues
+  issues: Issue[];
+  fetchIssues: () => Promise<void>;
+  createIssue: (data: Partial<Issue>) => Promise<Issue>;
+  updateIssue: (id: string, data: Partial<Issue>) => Promise<void>;
+  deleteIssue: (id: string) => Promise<void>;
+
+  // Test Plans
+  testPlans: TestPlan[];
+  fetchTestPlans: () => Promise<void>;
+  createTestPlan: (data: Partial<TestPlan>) => Promise<TestPlan>;
+  updateTestPlan: (id: string, data: Partial<TestPlan>) => Promise<void>;
+  deleteTestPlan: (id: string) => Promise<void>;
+
+  // Test Strategies
+  testStrategies: TestStrategy[];
+  fetchTestStrategies: () => Promise<void>;
+  createTestStrategy: (data: Partial<TestStrategy>) => Promise<TestStrategy>;
+  updateTestStrategy: (id: string, data: Partial<TestStrategy>) => Promise<void>;
+  deleteTestStrategy: (id: string) => Promise<void>;
+
+  // API Collections
+  apiCollections: ApiCollection[];
+  apiRequests: Record<string, ApiRequest[]>; // collectionId → requests
+  fetchApiCollections: () => Promise<void>;
+  createApiCollection: (data: Partial<ApiCollection>) => Promise<ApiCollection>;
+  updateApiCollection: (id: string, data: Partial<ApiCollection>) => Promise<void>;
+  deleteApiCollection: (id: string) => Promise<void>;
+  fetchApiRequests: (collectionId: string) => Promise<void>;
+  createApiRequest: (collectionId: string, data: Partial<ApiRequest>) => Promise<ApiRequest>;
+  updateApiRequest: (collectionId: string, requestId: string, data: Partial<ApiRequest>) => Promise<void>;
+  deleteApiRequest: (collectionId: string, requestId: string) => Promise<void>;
+
+  // Requirements
+  requirements: Requirement[];
+  fetchRequirements: () => Promise<void>;
+  createRequirement: (data: Partial<Requirement>) => Promise<Requirement>;
+  updateRequirement: (id: string, data: Partial<Requirement>) => Promise<void>;
+  deleteRequirement: (id: string) => Promise<void>;
 }
 
 // Helper: get active test from state
@@ -94,6 +137,12 @@ export const useStore = create<StoreState>()(
     runLoading: false,
     selectedStepId: null,
     paletteFilter: '',
+    issues: [],
+    testPlans: [],
+    testStrategies: [],
+    apiCollections: [],
+    apiRequests: {},
+    requirements: [],
 
     // ─── Suites ───────────────────────────────────────────────────────────────
 
@@ -344,6 +393,149 @@ export const useStore = create<StoreState>()(
     setView: (view) => set(s => { s.activeView = view; }),
     setSelectedStep: (id) => set(s => { s.selectedStepId = id; }),
     setPaletteFilter: (f) => set(s => { s.paletteFilter = f; }),
+
+    // ─── Issues ───────────────────────────────────────────────────────────────
+
+    fetchIssues: async () => {
+      const issues = await api.getIssues();
+      set(s => { s.issues = issues; });
+    },
+
+    createIssue: async (data) => {
+      const issue = await api.createIssue(data);
+      set(s => { s.issues.unshift(issue); });
+      return issue;
+    },
+
+    updateIssue: async (id, data) => {
+      const updated = await api.updateIssue(id, data);
+      set(s => { const idx = s.issues.findIndex(x => x.id === id); if (idx >= 0) s.issues[idx] = updated; });
+    },
+
+    deleteIssue: async (id) => {
+      await api.deleteIssue(id);
+      set(s => { s.issues = s.issues.filter(x => x.id !== id); });
+    },
+
+    // ─── Test Plans ───────────────────────────────────────────────────────────
+
+    fetchTestPlans: async () => {
+      const plans = await api.getTestPlans();
+      set(s => { s.testPlans = plans; });
+    },
+
+    createTestPlan: async (data) => {
+      const plan = await api.createTestPlan(data);
+      set(s => { s.testPlans.unshift(plan); });
+      return plan;
+    },
+
+    updateTestPlan: async (id, data) => {
+      const updated = await api.updateTestPlan(id, data);
+      set(s => { const idx = s.testPlans.findIndex(x => x.id === id); if (idx >= 0) s.testPlans[idx] = updated; });
+    },
+
+    deleteTestPlan: async (id) => {
+      await api.deleteTestPlan(id);
+      set(s => { s.testPlans = s.testPlans.filter(x => x.id !== id); });
+    },
+
+    // ─── Test Strategies ──────────────────────────────────────────────────────
+
+    fetchTestStrategies: async () => {
+      const strategies = await api.getTestStrategies();
+      set(s => { s.testStrategies = strategies; });
+    },
+
+    createTestStrategy: async (data) => {
+      const strategy = await api.createTestStrategy(data);
+      set(s => { s.testStrategies.unshift(strategy); });
+      return strategy;
+    },
+
+    updateTestStrategy: async (id, data) => {
+      const updated = await api.updateTestStrategy(id, data);
+      set(s => { const idx = s.testStrategies.findIndex(x => x.id === id); if (idx >= 0) s.testStrategies[idx] = updated; });
+    },
+
+    deleteTestStrategy: async (id) => {
+      await api.deleteTestStrategy(id);
+      set(s => { s.testStrategies = s.testStrategies.filter(x => x.id !== id); });
+    },
+
+    // ─── API Collections ──────────────────────────────────────────────────────
+
+    fetchApiCollections: async () => {
+      const cols = await api.getApiCollections();
+      set(s => { s.apiCollections = cols; });
+    },
+
+    createApiCollection: async (data) => {
+      const col = await api.createApiCollection(data);
+      set(s => { s.apiCollections.unshift(col); });
+      return col;
+    },
+
+    updateApiCollection: async (id, data) => {
+      const updated = await api.updateApiCollection(id, data);
+      set(s => { const idx = s.apiCollections.findIndex(x => x.id === id); if (idx >= 0) s.apiCollections[idx] = updated; });
+    },
+
+    deleteApiCollection: async (id) => {
+      await api.deleteApiCollection(id);
+      set(s => {
+        s.apiCollections = s.apiCollections.filter(x => x.id !== id);
+        delete s.apiRequests[id];
+      });
+    },
+
+    fetchApiRequests: async (collectionId) => {
+      const requests = await api.getApiRequests(collectionId);
+      set(s => { s.apiRequests[collectionId] = requests; });
+    },
+
+    createApiRequest: async (collectionId, data) => {
+      const request = await api.createApiRequest(collectionId, data);
+      set(s => { s.apiRequests[collectionId] = [request, ...(s.apiRequests[collectionId] ?? [])]; });
+      return request;
+    },
+
+    updateApiRequest: async (collectionId, requestId, data) => {
+      const updated = await api.updateApiRequest(collectionId, requestId, data);
+      set(s => {
+        const reqs = s.apiRequests[collectionId] ?? [];
+        const idx = reqs.findIndex(r => r.id === requestId);
+        if (idx >= 0) reqs[idx] = updated;
+      });
+    },
+
+    deleteApiRequest: async (collectionId, requestId) => {
+      await api.deleteApiRequest(collectionId, requestId);
+      set(s => { s.apiRequests[collectionId] = (s.apiRequests[collectionId] ?? []).filter(r => r.id !== requestId); });
+    },
+
+    // ─── Requirements ─────────────────────────────────────────────────────────
+
+    fetchRequirements: async () => {
+      const reqs = await api.getRequirements();
+      set(s => { s.requirements = reqs; });
+    },
+
+    createRequirement: async (data) => {
+      const req = await api.createRequirement(data);
+      set(s => { s.requirements.unshift(req); });
+      return req;
+    },
+
+    updateRequirement: async (id, data) => {
+      const updated = await api.updateRequirement(id, data);
+      set(s => { const idx = s.requirements.findIndex(x => x.id === id); if (idx >= 0) s.requirements[idx] = updated; });
+    },
+
+    deleteRequirement: async (id) => {
+      await api.deleteRequirement(id);
+      set(s => { s.requirements = s.requirements.filter(x => x.id !== id); });
+    },
   })),
 );
 

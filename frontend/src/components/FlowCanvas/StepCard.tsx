@@ -3,18 +3,18 @@ import { useStore } from '../../store/useStore';
 import type { Step } from '../../types';
 
 const STEP_COLORS: Record<string, string> = {
-  navigate:    'border-l-blue-500 bg-blue-950/20',
-  click:       'border-l-purple-500 bg-purple-950/20',
-  type:        'border-l-green-500 bg-green-950/20',
-  select:      'border-l-teal-500 bg-teal-950/20',
-  assert:      'border-l-amber-500 bg-amber-950/20',
-  wait:        'border-l-orange-500 bg-orange-950/20',
-  hover:       'border-l-pink-500 bg-pink-950/20',
-  keyboard:    'border-l-indigo-500 bg-indigo-950/20',
-  scroll:      'border-l-cyan-500 bg-cyan-950/20',
-  screenshot:  'border-l-violet-500 bg-violet-950/20',
-  conditional: 'border-l-rose-500 bg-rose-950/20',
-  pageObject:  'border-l-slate-400 bg-slate-800/60',
+  navigate:    'border-l-blue-500 bg-blue-50 dark:bg-blue-950/20',
+  click:       'border-l-purple-500 bg-purple-50 dark:bg-purple-950/20',
+  type:        'border-l-green-500 bg-green-50 dark:bg-green-950/20',
+  select:      'border-l-teal-500 bg-teal-50 dark:bg-teal-950/20',
+  assert:      'border-l-amber-500 bg-amber-50 dark:bg-amber-950/20',
+  wait:        'border-l-orange-500 bg-orange-50 dark:bg-orange-950/20',
+  hover:       'border-l-pink-500 bg-pink-50 dark:bg-pink-950/20',
+  keyboard:    'border-l-indigo-500 bg-indigo-50 dark:bg-indigo-950/20',
+  scroll:      'border-l-cyan-500 bg-cyan-50 dark:bg-cyan-950/20',
+  screenshot:  'border-l-violet-500 bg-violet-50 dark:bg-violet-950/20',
+  conditional: 'border-l-rose-500 bg-rose-50 dark:bg-rose-950/20',
+  pageObject:  'border-l-slate-400 bg-slate-100 dark:bg-slate-800/60',
 };
 
 const STEP_ICONS: Record<string, string> = {
@@ -79,7 +79,7 @@ export default function StepCard({ step, index, isSelected, onClick, dragHandleP
       {/* Drag handle */}
       <div
         {...dragHandleProps}
-        className="text-slate-600 hover:text-slate-400 cursor-grab active:cursor-grabbing select-none px-1 shrink-0"
+        className="text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-400 cursor-grab active:cursor-grabbing select-none px-1 shrink-0"
         style={{ touchAction: 'none' }}
         onClick={e => e.stopPropagation()}
       >
@@ -87,7 +87,7 @@ export default function StepCard({ step, index, isSelected, onClick, dragHandleP
       </div>
 
       {/* Step number */}
-      <span className="text-xs text-slate-600 w-5 shrink-0 text-right">{index + 1}</span>
+      <span className="text-xs text-slate-400 dark:text-slate-600 w-5 shrink-0 text-right">{index + 1}</span>
 
       {/* Icon */}
       <span className="text-sm w-5 shrink-0 text-center">{icon}</span>
@@ -95,11 +95,13 @@ export default function StepCard({ step, index, isSelected, onClick, dragHandleP
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-300 uppercase tracking-wide">{step.type}</span>
-          {step.disabled && <span className="badge-skipped text-xs">disabled</span>}
+          <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wide">{step.type}</span>
+          {step.disabled && (
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300">disabled</span>
+          )}
         </div>
-        <div className="text-xs text-slate-400 truncate font-mono">{step.name}</div>
-        <div className="text-xs text-slate-600 truncate">{getStepSummary(step)}</div>
+        <div className="text-xs text-slate-500 dark:text-slate-400 truncate font-mono">{step.name}</div>
+        <div className="text-xs text-slate-600 dark:text-slate-300 truncate">{getStepSummary(step)}</div>
       </div>
 
       {/* Actions */}
@@ -111,21 +113,21 @@ export default function StepCard({ step, index, isSelected, onClick, dragHandleP
         <button
           onClick={e => { e.stopPropagation(); toggleStepDisabled(step.id); }}
           title={step.disabled ? 'Enable' : 'Disable'}
-          className="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-amber-400 hover:bg-slate-700 transition-colors"
+          className="w-6 h-6 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors"
         >
           {step.disabled ? '▶' : '⊘'}
         </button>
         <button
           onClick={e => { e.stopPropagation(); duplicateStep(step.id); }}
           title="Duplicate"
-          className="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-blue-400 hover:bg-slate-700 transition-colors"
+          className="w-6 h-6 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors"
         >
           ⎘
         </button>
         <button
           onClick={e => { e.stopPropagation(); removeStep(step.id); }}
           title="Remove"
-          className="w-6 h-6 rounded flex items-center justify-center text-slate-500 hover:text-red-400 hover:bg-slate-700 transition-colors"
+          className="w-6 h-6 rounded-lg flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
         >
           ✕
         </button>

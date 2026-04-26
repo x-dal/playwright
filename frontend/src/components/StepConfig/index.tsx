@@ -29,7 +29,7 @@ export default function StepConfig() {
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-xs bg-slate-700 rounded px-2 py-0.5 text-slate-400 uppercase font-semibold">{step.type}</span>
+        <span className="text-xs bg-slate-200 dark:bg-slate-700 rounded px-2 py-0.5 text-slate-600 dark:text-slate-400 uppercase font-semibold">{step.type}</span>
         <input
           className="input flex-1 text-sm font-medium"
           value={step.name}

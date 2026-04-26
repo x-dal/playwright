@@ -81,10 +81,10 @@ export default function PageObjectsManager() {
   return (
     <div className="h-full flex overflow-hidden">
       {/* PO list */}
-      <div className="w-56 flex-shrink-0 border-r border-slate-800 flex flex-col">
-        <div className="flex items-center justify-between px-3 py-3 border-b border-slate-800">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Page Objects</span>
-          <button onClick={addPO} className="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 text-sm">+</button>
+      <div className="w-56 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+        <div className="flex items-center justify-between px-3 py-3 border-b border-slate-200 dark:border-slate-800">
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Page Objects</span>
+          <button onClick={addPO} className="w-5 h-5 rounded flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">+</button>
         </div>
         <div className="flex-1 overflow-y-auto">
           {pageObjects.length === 0 ? (
@@ -94,14 +94,14 @@ export default function PageObjectsManager() {
               <div
                 key={po.id}
                 onClick={() => setSelectedId(po.id)}
-                className={`group flex items-center gap-2 px-3 py-2.5 cursor-pointer border-b border-slate-800/50 transition-colors ${
-                  selectedId === po.id ? 'bg-blue-900/30 border-l-2 border-l-blue-500' : 'hover:bg-slate-800/50'
+                className={`group flex items-center gap-2 px-3 py-2.5 cursor-pointer border-b border-slate-200 dark:border-slate-800/50 transition-colors ${
+                  selectedId === po.id ? 'bg-blue-50 dark:bg-blue-900/30 border-l-2 border-l-blue-500' : 'hover:bg-slate-100 dark:hover:bg-slate-800/50'
                 }`}
               >
                 <span className="text-base">📦</span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs text-slate-300 truncate font-medium">{po.name || '(unnamed)'}</div>
-                  <div className="text-xs text-slate-600">{po.steps.length} steps · {po.params.length} params</div>
+                  <div className="text-xs text-slate-700 dark:text-slate-300 truncate font-medium">{po.name || '(unnamed)'}</div>
+                  <div className="text-xs text-slate-400 dark:text-slate-600">{po.steps.length} steps · {po.params.length} params</div>
                 </div>
                 <button
                   onClick={e => { e.stopPropagation(); removePO(po.id); }}
@@ -112,7 +112,7 @@ export default function PageObjectsManager() {
           )}
         </div>
         {dirty && (
-          <div className="p-3 border-t border-slate-800">
+          <div className="p-3 border-t border-slate-200 dark:border-slate-800">
             <button onClick={save} disabled={saving} className="btn-primary w-full text-xs">
               {saving ? 'Saving…' : '💾 Save Changes'}
             </button>
@@ -145,7 +145,7 @@ export default function PageObjectsManager() {
             ) : (
               <div className="flex flex-wrap gap-2">
                 {selected.params.map((p, i) => (
-                  <div key={i} className="flex items-center gap-1 bg-slate-800 border border-slate-700 rounded-lg px-2 py-1">
+                  <div key={i} className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-2 py-1">
                     <span className="text-xs text-slate-400 font-mono">{'{{'}
                     </span>
                     <input
@@ -169,21 +169,21 @@ export default function PageObjectsManager() {
               <div className="flex gap-1">
                 {['navigate', 'click', 'type', 'assert'].map(t => (
                   <button key={t} onClick={() => addStep(selected.id, t)}
-                    className="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 rounded px-2 py-1">+ {t}</button>
+                    className="text-xs bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded px-2 py-1">+ {t}</button>
                 ))}
               </div>
             </div>
 
             {selected.steps.length === 0 ? (
-              <div className="border-2 border-dashed border-slate-700 rounded-xl p-6 text-center text-slate-600 text-sm">
+              <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 text-center text-slate-400 dark:text-slate-600 text-sm">
                 Add steps using the buttons above
               </div>
             ) : (
               <div className="space-y-2">
                 {selected.steps.map((step, idx) => (
-                  <div key={step.id} className="flex items-center gap-3 p-3 bg-slate-900/60 rounded-lg border border-slate-700">
-                    <span className="text-xs text-slate-600 w-5">{idx + 1}</span>
-                    <span className="text-xs bg-slate-700 rounded px-1.5 py-0.5 text-slate-300 font-mono shrink-0">{step.type}</span>
+                  <div key={step.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-900/60 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <span className="text-xs text-slate-400 dark:text-slate-600 w-5">{idx + 1}</span>
+                    <span className="text-xs bg-slate-200 dark:bg-slate-700 rounded px-1.5 py-0.5 text-slate-600 dark:text-slate-300 font-mono shrink-0">{step.type}</span>
                     <input
                       className="input flex-1 text-xs"
                       value={step.name}
@@ -201,9 +201,9 @@ export default function PageObjectsManager() {
           </div>
 
           {/* Usage hint */}
-          <div className="bg-slate-900/40 border border-slate-700 rounded-lg p-4 text-xs text-slate-500">
-            <div className="font-medium text-slate-400 mb-1">Usage</div>
-            <p>Reference this page object in any test by adding a <span className="font-mono bg-slate-800 px-1 rounded">pageObject</span> step and selecting <span className="text-slate-300">{selected.name}</span>.</p>
+          <div className="bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-xs text-slate-500">
+            <div className="font-medium text-slate-600 dark:text-slate-400 mb-1">Usage</div>
+            <p>Reference this page object in any test by adding a <span className="font-mono bg-slate-200 dark:bg-slate-800 px-1 rounded">pageObject</span> step and selecting <span className="text-slate-700 dark:text-slate-300">{selected.name}</span>.</p>
             {selected.params.length > 0 && (
               <p className="mt-1">Provide values for: <span className="text-blue-400 font-mono">{selected.params.map(p => `{{${p}}}`).join(', ')}</span></p>
             )}
