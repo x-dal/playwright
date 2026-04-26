@@ -16,9 +16,9 @@ const DEFAULT_OPTS: ExecutionOptions = {
   retries: 1,
 };
 
-// GET /api/suites
-router.get('/', (_req: Request, res: Response) => {
-  res.json(getAllSuites());
+// GET /api/suites[?projectId=]
+router.get('/', (req: Request, res: Response) => {
+  res.json(getAllSuites(req.query.projectId as string | undefined));
 });
 
 // GET /api/suites/:id
@@ -30,13 +30,14 @@ router.get('/:id', (req: Request, res: Response) => {
 
 // POST /api/suites
 router.post('/', (req: Request, res: Response) => {
-  const { name, description } = req.body;
+  const { name, description, projectId } = req.body;
   if (!name) return res.status(400).json({ error: 'name is required' });
 
   const now = new Date().toISOString();
   const suite: TestSuite = {
     id: uuid(),
     name,
+    projectId: projectId ?? undefined,
     description: description ?? '',
     tests: [],
     pageObjects: [],

@@ -37,6 +37,11 @@ exports.getAllRequirements = getAllRequirements;
 exports.getRequirementById = getRequirementById;
 exports.upsertRequirement = upsertRequirement;
 exports.deleteRequirement = deleteRequirement;
+exports.getAllProjects = getAllProjects;
+exports.getProjectById = getProjectById;
+exports.upsertProject = upsertProject;
+exports.deleteProject = deleteProject;
+exports.getProjectStats = getProjectStats;
 const better_sqlite3_1 = __importDefault(require("better-sqlite3"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -148,14 +153,30 @@ function initSchema(db) {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS projects (
+      id          TEXT PRIMARY KEY,
+      name        TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      data        TEXT NOT NULL,
+      created_at  TEXT NOT NULL,
+      updated_at  TEXT NOT NULL
+    );
   `);
+    // Add project_id column to existing tables if not already present (idempotent migration)
+    for (const table of ['test_suites', 'issues', 'test_plans', 'test_strategies', 'api_collections', 'requirements']) {
+        try {
+            db.exec(`ALTER TABLE ${table} ADD COLUMN project_id TEXT`);
+        }
+        catch { /* column already exists */ }
+    }
 }
 // ─── Suite helpers ─────────────────────────────────────────────────────────────
-function getAllSuites() {
-    return getDb()
-        .prepare('SELECT data FROM test_suites ORDER BY updated_at DESC')
-        .all()
-        .map((row) => JSON.parse(row.data));
+function getAllSuites(projectId) {
+    const rows = projectId
+        ? getDb().prepare('SELECT data FROM test_suites WHERE project_id = ? ORDER BY updated_at DESC').all(projectId)
+        : getDb().prepare('SELECT data FROM test_suites ORDER BY updated_at DESC').all();
+    return rows.map(row => JSON.parse(row.data));
 }
 function getSuiteById(id) {
     const row = getDb()
@@ -166,16 +187,18 @@ function getSuiteById(id) {
 function upsertSuite(suite) {
     getDb()
         .prepare(`
-      INSERT INTO test_suites (id, name, data, created_at, updated_at)
-      VALUES (@id, @name, @data, @created_at, @updated_at)
+      INSERT INTO test_suites (id, name, project_id, data, created_at, updated_at)
+      VALUES (@id, @name, @project_id, @data, @created_at, @updated_at)
       ON CONFLICT(id) DO UPDATE SET
         name = @name,
+        project_id = @project_id,
         data = @data,
         updated_at = @updated_at
     `)
         .run({
         id: suite.id,
         name: suite.name,
+        project_id: suite.projectId ?? null,
         data: JSON.stringify(suite),
         created_at: suite.createdAt,
         updated_at: suite.updatedAt,
@@ -221,11 +244,11 @@ function upsertRun(run) {
     });
 }
 // ─── Issue helpers ─────────────────────────────────────────────────────────────
-function getAllIssues() {
-    return getDb()
-        .prepare('SELECT data FROM issues ORDER BY created_at DESC')
-        .all()
-        .map((r) => JSON.parse(r.data));
+function getAllIssues(projectId) {
+    const rows = projectId
+        ? getDb().prepare('SELECT data FROM issues WHERE project_id = ? ORDER BY created_at DESC').all(projectId)
+        : getDb().prepare('SELECT data FROM issues ORDER BY created_at DESC').all();
+    return rows.map(r => JSON.parse(r.data));
 }
 function getIssueById(id) {
     const row = getDb().prepare('SELECT data FROM issues WHERE id = ?').get(id);
@@ -233,14 +256,15 @@ function getIssueById(id) {
 }
 function upsertIssue(issue) {
     getDb().prepare(`
-    INSERT INTO issues (id, title, status, priority, severity, data, created_at, updated_at)
-    VALUES (@id, @title, @status, @priority, @severity, @data, @created_at, @updated_at)
+    INSERT INTO issues (id, title, status, priority, severity, project_id, data, created_at, updated_at)
+    VALUES (@id, @title, @status, @priority, @severity, @project_id, @data, @created_at, @updated_at)
     ON CONFLICT(id) DO UPDATE SET
       title = @title, status = @status, priority = @priority,
-      severity = @severity, data = @data, updated_at = @updated_at
+      severity = @severity, project_id = @project_id, data = @data, updated_at = @updated_at
   `).run({
         id: issue.id, title: issue.title, status: issue.status,
         priority: issue.priority, severity: issue.severity,
+        project_id: issue.projectId ?? null,
         data: JSON.stringify(issue),
         created_at: issue.createdAt, updated_at: issue.updatedAt,
     });
@@ -249,11 +273,11 @@ function deleteIssue(id) {
     getDb().prepare('DELETE FROM issues WHERE id = ?').run(id);
 }
 // ─── Test Plan helpers ─────────────────────────────────────────────────────────
-function getAllTestPlans() {
-    return getDb()
-        .prepare('SELECT data FROM test_plans ORDER BY updated_at DESC')
-        .all()
-        .map((r) => JSON.parse(r.data));
+function getAllTestPlans(projectId) {
+    const rows = projectId
+        ? getDb().prepare('SELECT data FROM test_plans WHERE project_id = ? ORDER BY updated_at DESC').all(projectId)
+        : getDb().prepare('SELECT data FROM test_plans ORDER BY updated_at DESC').all();
+    return rows.map(r => JSON.parse(r.data));
 }
 function getTestPlanById(id) {
     const row = getDb().prepare('SELECT data FROM test_plans WHERE id = ?').get(id);
@@ -261,20 +285,20 @@ function getTestPlanById(id) {
 }
 function upsertTestPlan(plan) {
     getDb().prepare(`
-    INSERT INTO test_plans (id, name, data, created_at, updated_at)
-    VALUES (@id, @name, @data, @created_at, @updated_at)
-    ON CONFLICT(id) DO UPDATE SET name = @name, data = @data, updated_at = @updated_at
-  `).run({ id: plan.id, name: plan.name, data: JSON.stringify(plan), created_at: plan.createdAt, updated_at: plan.updatedAt });
+    INSERT INTO test_plans (id, name, project_id, data, created_at, updated_at)
+    VALUES (@id, @name, @project_id, @data, @created_at, @updated_at)
+    ON CONFLICT(id) DO UPDATE SET name = @name, project_id = @project_id, data = @data, updated_at = @updated_at
+  `).run({ id: plan.id, name: plan.name, project_id: plan.projectId ?? null, data: JSON.stringify(plan), created_at: plan.createdAt, updated_at: plan.updatedAt });
 }
 function deleteTestPlan(id) {
     getDb().prepare('DELETE FROM test_plans WHERE id = ?').run(id);
 }
 // ─── Test Strategy helpers ────────────────────────────────────────────────────
-function getAllTestStrategies() {
-    return getDb()
-        .prepare('SELECT data FROM test_strategies ORDER BY updated_at DESC')
-        .all()
-        .map((r) => JSON.parse(r.data));
+function getAllTestStrategies(projectId) {
+    const rows = projectId
+        ? getDb().prepare('SELECT data FROM test_strategies WHERE project_id = ? ORDER BY updated_at DESC').all(projectId)
+        : getDb().prepare('SELECT data FROM test_strategies ORDER BY updated_at DESC').all();
+    return rows.map(r => JSON.parse(r.data));
 }
 function getTestStrategyById(id) {
     const row = getDb().prepare('SELECT data FROM test_strategies WHERE id = ?').get(id);
@@ -282,20 +306,20 @@ function getTestStrategyById(id) {
 }
 function upsertTestStrategy(strategy) {
     getDb().prepare(`
-    INSERT INTO test_strategies (id, name, data, created_at, updated_at)
-    VALUES (@id, @name, @data, @created_at, @updated_at)
-    ON CONFLICT(id) DO UPDATE SET name = @name, data = @data, updated_at = @updated_at
-  `).run({ id: strategy.id, name: strategy.name, data: JSON.stringify(strategy), created_at: strategy.createdAt, updated_at: strategy.updatedAt });
+    INSERT INTO test_strategies (id, name, project_id, data, created_at, updated_at)
+    VALUES (@id, @name, @project_id, @data, @created_at, @updated_at)
+    ON CONFLICT(id) DO UPDATE SET name = @name, project_id = @project_id, data = @data, updated_at = @updated_at
+  `).run({ id: strategy.id, name: strategy.name, project_id: strategy.projectId ?? null, data: JSON.stringify(strategy), created_at: strategy.createdAt, updated_at: strategy.updatedAt });
 }
 function deleteTestStrategy(id) {
     getDb().prepare('DELETE FROM test_strategies WHERE id = ?').run(id);
 }
 // ─── API Collection helpers ───────────────────────────────────────────────────
-function getAllApiCollections() {
-    return getDb()
-        .prepare('SELECT data FROM api_collections ORDER BY updated_at DESC')
-        .all()
-        .map((r) => JSON.parse(r.data));
+function getAllApiCollections(projectId) {
+    const rows = projectId
+        ? getDb().prepare('SELECT data FROM api_collections WHERE project_id = ? ORDER BY updated_at DESC').all(projectId)
+        : getDb().prepare('SELECT data FROM api_collections ORDER BY updated_at DESC').all();
+    return rows.map(r => JSON.parse(r.data));
 }
 function getApiCollectionById(id) {
     const row = getDb().prepare('SELECT data FROM api_collections WHERE id = ?').get(id);
@@ -303,10 +327,10 @@ function getApiCollectionById(id) {
 }
 function upsertApiCollection(col) {
     getDb().prepare(`
-    INSERT INTO api_collections (id, name, data, created_at, updated_at)
-    VALUES (@id, @name, @data, @created_at, @updated_at)
-    ON CONFLICT(id) DO UPDATE SET name = @name, data = @data, updated_at = @updated_at
-  `).run({ id: col.id, name: col.name, data: JSON.stringify(col), created_at: col.createdAt, updated_at: col.updatedAt });
+    INSERT INTO api_collections (id, name, project_id, data, created_at, updated_at)
+    VALUES (@id, @name, @project_id, @data, @created_at, @updated_at)
+    ON CONFLICT(id) DO UPDATE SET name = @name, project_id = @project_id, data = @data, updated_at = @updated_at
+  `).run({ id: col.id, name: col.name, project_id: col.projectId ?? null, data: JSON.stringify(col), created_at: col.createdAt, updated_at: col.updatedAt });
 }
 function deleteApiCollection(id) {
     getDb().prepare('DELETE FROM api_collections WHERE id = ?').run(id);
@@ -335,11 +359,11 @@ function deleteApiRequest(id) {
     getDb().prepare('DELETE FROM api_requests WHERE id = ?').run(id);
 }
 // ─── Requirement helpers ──────────────────────────────────────────────────────
-function getAllRequirements() {
-    return getDb()
-        .prepare('SELECT data FROM requirements ORDER BY updated_at DESC')
-        .all()
-        .map((r) => JSON.parse(r.data));
+function getAllRequirements(projectId) {
+    const rows = projectId
+        ? getDb().prepare('SELECT data FROM requirements WHERE project_id = ? ORDER BY updated_at DESC').all(projectId)
+        : getDb().prepare('SELECT data FROM requirements ORDER BY updated_at DESC').all();
+    return rows.map(r => JSON.parse(r.data));
 }
 function getRequirementById(id) {
     const row = getDb().prepare('SELECT data FROM requirements WHERE id = ?').get(id);
@@ -347,14 +371,50 @@ function getRequirementById(id) {
 }
 function upsertRequirement(req) {
     getDb().prepare(`
-    INSERT INTO requirements (id, title, status, priority, data, created_at, updated_at)
-    VALUES (@id, @title, @status, @priority, @data, @created_at, @updated_at)
+    INSERT INTO requirements (id, title, status, priority, project_id, data, created_at, updated_at)
+    VALUES (@id, @title, @status, @priority, @project_id, @data, @created_at, @updated_at)
     ON CONFLICT(id) DO UPDATE SET
       title = @title, status = @status, priority = @priority,
-      data = @data, updated_at = @updated_at
-  `).run({ id: req.id, title: req.title, status: req.status, priority: req.priority, data: JSON.stringify(req), created_at: req.createdAt, updated_at: req.updatedAt });
+      project_id = @project_id, data = @data, updated_at = @updated_at
+  `).run({ id: req.id, title: req.title, status: req.status, priority: req.priority, project_id: req.projectId ?? null, data: JSON.stringify(req), created_at: req.createdAt, updated_at: req.updatedAt });
 }
 function deleteRequirement(id) {
     getDb().prepare('DELETE FROM requirements WHERE id = ?').run(id);
+}
+// ─── Project helpers ──────────────────────────────────────────────────────────
+function getAllProjects() {
+    return getDb().prepare('SELECT data FROM projects ORDER BY updated_at DESC').all()
+        .map(r => JSON.parse(r.data));
+}
+function getProjectById(id) {
+    const row = getDb().prepare('SELECT data FROM projects WHERE id = ?').get(id);
+    return row ? JSON.parse(row.data) : undefined;
+}
+function upsertProject(project) {
+    getDb().prepare(`
+    INSERT INTO projects (id, name, description, data, created_at, updated_at)
+    VALUES (@id, @name, @description, @data, @created_at, @updated_at)
+    ON CONFLICT(id) DO UPDATE SET name = @name, description = @description, data = @data, updated_at = @updated_at
+  `).run({
+        id: project.id, name: project.name, description: project.description,
+        data: JSON.stringify(project),
+        created_at: project.createdAt, updated_at: project.updatedAt,
+    });
+}
+function deleteProject(id) {
+    getDb().prepare('DELETE FROM projects WHERE id = ?').run(id);
+}
+// Returns aggregate counts for a project (used by ProjectsDashboard cards)
+function getProjectStats(projectId) {
+    const count = (table, extra = '') => getDb().prepare(`SELECT COUNT(*) as n FROM ${table} WHERE project_id = ? ${extra}`).get(projectId).n;
+    return {
+        suites: count('test_suites'),
+        requirements: count('requirements'),
+        plans: count('test_plans'),
+        strategies: count('test_strategies'),
+        collections: count('api_collections'),
+        openIssues: count('issues', `AND (json_extract(data,'$.status')='open' OR json_extract(data,'$.status')='in-progress')`),
+        totalIssues: count('issues'),
+    };
 }
 //# sourceMappingURL=database.js.map

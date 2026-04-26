@@ -5,8 +5,8 @@ import type { Requirement } from '../db/models';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
-  res.json(getAllRequirements());
+router.get('/', (req, res) => {
+  res.json(getAllRequirements(req.query.projectId as string | undefined));
 });
 
 router.get('/:id', (req, res) => {
@@ -16,13 +16,14 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { title, description, priority, status, tags, linkedTestIds, linkedApiCollectionIds } = req.body;
+  const { title, description, priority, status, tags, linkedTestIds, linkedApiCollectionIds, projectId } = req.body;
   if (!title?.trim()) return res.status(400).json({ error: 'title is required' });
 
   const now = new Date().toISOString();
   const requirement: Requirement = {
     id: uuidv4(),
     title: title.trim(),
+    projectId: projectId ?? undefined,
     description: description ?? '',
     priority: priority ?? 'medium',
     status: status ?? 'draft',

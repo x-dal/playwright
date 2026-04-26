@@ -16,7 +16,7 @@ export type StepType =
 
 export type LocatorType =
   | 'css' | 'xpath' | 'role' | 'label' | 'placeholder'
-  | 'text' | 'testId' | 'altText' | 'title';
+  | 'text' | 'testId' | 'altText' | 'title' | 'raw';
 
 export interface LocatorOptions {
   name?: string;
@@ -213,6 +213,7 @@ export interface Test {
 export interface TestSuite {
   id: string;
   name: string;
+  projectId?: string;
   description: string;
   tests: Test[];
   pageObjects: PageObject[];
@@ -272,6 +273,16 @@ export interface RecorderSession {
   recordedSteps?: Step[];
 }
 
+// ─── Project ──────────────────────────────────────────────────────────────────
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // ─── Issue Tracker ────────────────────────────────────────────────────────────
 
 export type IssueStatus = 'open' | 'in-progress' | 'resolved' | 'closed';
@@ -287,6 +298,7 @@ export interface Issue {
   severity: IssueSeverity;
   createdAt: string;
   updatedAt: string;
+  projectId?: string;
   testRunId?: string;
   testName?: string;
   errorMessage?: string;
@@ -300,6 +312,7 @@ export interface Issue {
 export interface TestPlan {
   id: string;
   name: string;
+  projectId?: string;
   objective: string;
   scope: string;
   entryCriteria: string;
@@ -318,6 +331,7 @@ export type TestLevel = 'unit' | 'integration' | 'system' | 'acceptance';
 export interface TestStrategy {
   id: string;
   name: string;
+  projectId?: string;
   approach: string;
   testLevels: TestLevel[];
   tools: string;
@@ -337,6 +351,7 @@ export interface ApiEnvironment {
 export interface ApiCollection {
   id: string;
   name: string;
+  projectId?: string;
   description: string;
   environments: ApiEnvironment[];
   activeEnvironment?: string;
@@ -392,6 +407,7 @@ export type RequirementPriority = 'low' | 'medium' | 'high' | 'critical';
 export interface Requirement {
   id: string;
   title: string;
+  projectId?: string;
   description: string;
   priority: RequirementPriority;
   status: RequirementStatus;

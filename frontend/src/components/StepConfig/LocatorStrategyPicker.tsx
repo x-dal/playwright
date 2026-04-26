@@ -38,6 +38,7 @@ const PLACEHOLDER_MAP: Record<LocatorType, string> = {
   testId:      'login-button',
   altText:     'Company logo',
   title:       'Close dialog',
+  raw:         'page.locator(\'label\').filter({ hasText: \'…\' }).getByLabel(\'…\')',
 };
 
 export default function LocatorStrategyPicker({ locatorType, selector, locatorOptions, onChange, label = 'Locator' }: Props) {
@@ -93,6 +94,16 @@ export default function LocatorStrategyPicker({ locatorType, selector, locatorOp
             placeholder="or type role name"
           />
         </div>
+      ) : type === 'raw' ? (
+        /* Raw: full page.xxx().yyy() expression — show as multi-line textarea */
+        <textarea
+          className="input w-full font-mono text-xs resize-y"
+          rows={3}
+          value={selector}
+          onChange={e => handleSelectorChange(e.target.value)}
+          placeholder={PLACEHOLDER_MAP.raw}
+          spellCheck={false}
+        />
       ) : (
         <input
           className="input w-full font-mono text-xs"

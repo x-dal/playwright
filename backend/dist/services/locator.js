@@ -20,6 +20,7 @@ function buildLocatorCode(locatorType, selector, options) {
         case 'testId': return `page.getByTestId('${s}')`;
         case 'altText': return withExact(`page.getByAltText('${s}'`, options);
         case 'title': return withExact(`page.getByTitle('${s}'`, options);
+        case 'raw': return selector; // full page.xxx().yyy()... expression stored verbatim
     }
 }
 /** Returns the live Playwright Locator object for test execution */
@@ -36,6 +37,7 @@ function getLocator(page, locatorType, selector, options) {
         case 'testId': return page.getByTestId(selector);
         case 'altText': return page.getByAltText(selector, clean);
         case 'title': return page.getByTitle(selector, clean);
+        case 'raw': return (new Function('page', `return ${selector}`))(page);
     }
 }
 // ─── Private helpers ───────────────────────────────────────────────────────────

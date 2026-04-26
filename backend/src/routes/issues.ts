@@ -5,8 +5,8 @@ import type { Issue } from '../db/models';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
-  res.json(getAllIssues());
+router.get('/', (req, res) => {
+  res.json(getAllIssues(req.query.projectId as string | undefined));
 });
 
 router.get('/:id', (req, res) => {
@@ -16,7 +16,7 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { title, description, status, priority, severity, testRunId, testName, errorMessage, screenshotPath, externalUrl } = req.body;
+  const { title, description, status, priority, severity, projectId, testRunId, testName, errorMessage, screenshotPath, externalUrl } = req.body;
   if (!title?.trim()) return res.status(400).json({ error: 'title is required' });
 
   const now = new Date().toISOString();
@@ -27,6 +27,7 @@ router.post('/', (req, res) => {
     status: status ?? 'open',
     priority: priority ?? 'medium',
     severity: severity ?? 'major',
+    projectId: projectId ?? undefined,
     createdAt: now,
     updatedAt: now,
     testRunId,

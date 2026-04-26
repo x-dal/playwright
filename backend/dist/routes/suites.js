@@ -12,9 +12,9 @@ const DEFAULT_OPTS = {
     timeout: 30000,
     retries: 1,
 };
-// GET /api/suites
-router.get('/', (_req, res) => {
-    res.json((0, database_1.getAllSuites)());
+// GET /api/suites[?projectId=]
+router.get('/', (req, res) => {
+    res.json((0, database_1.getAllSuites)(req.query.projectId));
 });
 // GET /api/suites/:id
 router.get('/:id', (req, res) => {
@@ -25,13 +25,14 @@ router.get('/:id', (req, res) => {
 });
 // POST /api/suites
 router.post('/', (req, res) => {
-    const { name, description } = req.body;
+    const { name, description, projectId } = req.body;
     if (!name)
         return res.status(400).json({ error: 'name is required' });
     const now = new Date().toISOString();
     const suite = {
         id: (0, uuid_1.v4)(),
         name,
+        projectId: projectId ?? undefined,
         description: description ?? '',
         tests: [],
         pageObjects: [],

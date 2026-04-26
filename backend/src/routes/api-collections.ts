@@ -11,8 +11,8 @@ const router = Router();
 
 // ─── Collections ──────────────────────────────────────────────────────────────
 
-router.get('/', (_req, res) => {
-  res.json(getAllApiCollections());
+router.get('/', (req, res) => {
+  res.json(getAllApiCollections(req.query.projectId as string | undefined));
 });
 
 router.get('/:id', (req, res) => {
@@ -22,13 +22,14 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { name, description, environments, activeEnvironment } = req.body;
+  const { name, description, environments, activeEnvironment, projectId } = req.body;
   if (!name?.trim()) return res.status(400).json({ error: 'name is required' });
 
   const now = new Date().toISOString();
   const col: ApiCollection = {
     id: uuidv4(),
     name: name.trim(),
+    projectId: projectId ?? undefined,
     description: description ?? '',
     environments: environments ?? [],
     activeEnvironment,

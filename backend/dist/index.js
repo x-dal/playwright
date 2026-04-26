@@ -16,6 +16,7 @@ const plans_1 = __importDefault(require("./routes/plans"));
 const strategies_1 = __importDefault(require("./routes/strategies"));
 const api_collections_1 = __importDefault(require("./routes/api-collections"));
 const requirements_1 = __importDefault(require("./routes/requirements"));
+const projects_1 = __importDefault(require("./routes/projects"));
 const app = (0, express_1.default)();
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 // ─── Middleware ────────────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ app.use('/api/suites', suites_1.default);
 app.use('/api/runs', runs_1.default);
 app.use('/api/recorder', recorder_1.default);
 app.use('/api/export', export_1.default);
+app.use('/api/projects', projects_1.default);
 app.use('/api/issues', issues_1.default);
 app.use('/api/plans', plans_1.default);
 app.use('/api/strategies', strategies_1.default);

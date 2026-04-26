@@ -5,8 +5,8 @@ import type { TestStrategy } from '../db/models';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
-  res.json(getAllTestStrategies());
+router.get('/', (req, res) => {
+  res.json(getAllTestStrategies(req.query.projectId as string | undefined));
 });
 
 router.get('/:id', (req, res) => {
@@ -16,13 +16,14 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { name, approach, testLevels, tools, riskAnalysis, notes } = req.body;
+  const { name, approach, testLevels, tools, riskAnalysis, notes, projectId } = req.body;
   if (!name?.trim()) return res.status(400).json({ error: 'name is required' });
 
   const now = new Date().toISOString();
   const strategy: TestStrategy = {
     id: uuidv4(),
     name: name.trim(),
+    projectId: projectId ?? undefined,
     approach: approach ?? '',
     testLevels: testLevels ?? [],
     tools: tools ?? '',

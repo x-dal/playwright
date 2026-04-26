@@ -21,7 +21,7 @@ const THEME_OPTIONS: { id: Theme; icon: string; label: string; desc: string }[] 
 ];
 
 export default function Layout({ children }: Props) {
-  const { activeView, setView, activeSuiteId, runs, issues } = useStore();
+  const { activeView, setView, activeSuiteId, runs, issues, projects, activeProjectId, setActiveProject } = useStore();
   const activeSuite = useStore(selectActiveSuite);
   const { theme, setTheme } = useTheme();
   const [showSettings, setShowSettings] = useState(false);
@@ -29,6 +29,7 @@ export default function Layout({ children }: Props) {
 
   const pendingRuns = runs.filter(r => r.status === 'running' || r.status === 'pending').length;
   const openIssues = issues.filter(i => i.status === 'open' || i.status === 'in-progress').length;
+  const activeProject = projects.find(p => p.id === activeProjectId);
 
   const groups = [
     { key: 'main',   label: null },
@@ -39,14 +40,25 @@ export default function Layout({ children }: Props) {
   return (
     <div className="flex h-screen overflow-hidden bg-slate-100 dark:bg-slate-950">
       {/* Sidebar */}
-      <aside className="w-56 flex-shrink-0 flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 relative">
-        {/* Logo */}
-        <div className="px-4 py-5 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+      <aside className="w-56 flex-shrink-0 flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
+        {/* Project header */}
+        <div className="px-3 py-4 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+          {/* Back to projects */}
+          <button
+            onClick={() => setActiveProject(null)}
+            className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mb-2 w-full"
+          >
+            <span>←</span>
+            <span>All Projects</span>
+          </button>
+          {/* Project name */}
           <div className="flex items-center gap-2">
-            <span className="text-2xl">🎭</span>
-            <div>
-              <div className="text-sm font-semibold text-slate-900 dark:text-white">Playwright</div>
-              <div className="text-xs text-slate-500">Automation Studio</div>
+            <span className="text-lg flex-shrink-0">📁</span>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                {activeProject?.name ?? 'Project'}
+              </div>
+              <div className="text-xs text-slate-400 dark:text-slate-500">Automation Studio</div>
             </div>
           </div>
         </div>
@@ -122,9 +134,7 @@ export default function Layout({ children }: Props) {
 
             {showSettings && (
               <>
-                {/* Backdrop */}
                 <div className="fixed inset-0 z-40" onClick={() => setShowSettings(false)} />
-                {/* Panel */}
                 <div className="absolute bottom-full left-0 mb-2 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-3 z-50">
                   <p className="text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 px-1">
                     Appearance
@@ -146,9 +156,7 @@ export default function Layout({ children }: Props) {
                             {opt.desc}
                           </div>
                         </div>
-                        {theme === opt.id && (
-                          <span className="text-xs ml-auto flex-shrink-0">✓</span>
-                        )}
+                        {theme === opt.id && <span className="text-xs ml-auto flex-shrink-0">✓</span>}
                       </button>
                     ))}
                   </div>

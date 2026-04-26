@@ -1,5 +1,5 @@
 export type StepType = 'navigate' | 'click' | 'type' | 'select' | 'wait' | 'assert' | 'pageObject' | 'conditional' | 'hover' | 'keyboard' | 'scroll' | 'screenshot';
-export type LocatorType = 'css' | 'xpath' | 'role' | 'label' | 'placeholder' | 'text' | 'testId' | 'altText' | 'title';
+export type LocatorType = 'css' | 'xpath' | 'role' | 'label' | 'placeholder' | 'text' | 'testId' | 'altText' | 'title' | 'raw';
 export interface LocatorOptions {
     name?: string;
     exact?: boolean;
@@ -143,6 +143,7 @@ export interface Test {
 export interface TestSuite {
     id: string;
     name: string;
+    projectId?: string;
     description: string;
     tests: Test[];
     pageObjects: PageObject[];
@@ -192,6 +193,13 @@ export interface RecorderSession {
     stoppedAt?: string;
     recordedSteps?: Step[];
 }
+export interface Project {
+    id: string;
+    name: string;
+    description: string;
+    createdAt: string;
+    updatedAt: string;
+}
 export type IssueStatus = 'open' | 'in-progress' | 'resolved' | 'closed';
 export type IssuePriority = 'low' | 'medium' | 'high' | 'critical';
 export type IssueSeverity = 'minor' | 'major' | 'critical' | 'blocker';
@@ -204,6 +212,7 @@ export interface Issue {
     severity: IssueSeverity;
     createdAt: string;
     updatedAt: string;
+    projectId?: string;
     testRunId?: string;
     testName?: string;
     errorMessage?: string;
@@ -213,6 +222,7 @@ export interface Issue {
 export interface TestPlan {
     id: string;
     name: string;
+    projectId?: string;
     objective: string;
     scope: string;
     entryCriteria: string;
@@ -227,6 +237,7 @@ export type TestLevel = 'unit' | 'integration' | 'system' | 'acceptance';
 export interface TestStrategy {
     id: string;
     name: string;
+    projectId?: string;
     approach: string;
     testLevels: TestLevel[];
     tools: string;
@@ -242,6 +253,7 @@ export interface ApiEnvironment {
 export interface ApiCollection {
     id: string;
     name: string;
+    projectId?: string;
     description: string;
     environments: ApiEnvironment[];
     activeEnvironment?: string;
@@ -293,6 +305,7 @@ export type RequirementPriority = 'low' | 'medium' | 'high' | 'critical';
 export interface Requirement {
     id: string;
     title: string;
+    projectId?: string;
     description: string;
     priority: RequirementPriority;
     status: RequirementStatus;

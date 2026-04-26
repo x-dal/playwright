@@ -269,121 +269,209 @@ function parseCodegenOutput(code) {
                 }
             }
         }
-        // locator-based actions: await page.METHOD(ARGS).ACTION(...)
+        // Simple single-locator-method pattern: await page.METHOD(ARGS).ACTION(...)
+        // Handles: page.getByRole(...).click(), page.getByLabel(...).fill(...), etc.
         const prefixM = LOCATOR_PREFIX_RE.exec(line);
         if (prefixM && line.startsWith('await page.')) {
             const methodName = prefixM[1];
             const openIdx = (prefixM.index ?? 0) + prefixM[0].length - 1;
             const argsResult = scanBalancedArgs(line, openIdx);
-            if (!argsResult)
-                continue;
-            const { raw: argsRaw, closeIdx } = argsResult;
-            const after = line.slice(closeIdx + 1);
-            const { selector, options } = parseLocatorArgs(argsRaw);
-            const locatorType = METHOD_TO_LOCATOR[methodName] ?? 'css';
-            const locPatch = { selector, locatorType, ...(options ? { locatorOptions: options } : {}) };
-            if (/^\.click\(\s*\)/.test(after)) {
-                steps.push({ id: nextId(), type: 'click', name: `Click ${describeLocator(locatorType, selector, options)}`, ...locPatch });
-                continue;
-            }
-            if (/^\.hover\(\s*\)/.test(after)) {
-                steps.push({ id: nextId(), type: 'hover', name: `Hover ${describeLocator(locatorType, selector, options)}`, ...locPatch });
-                continue;
-            }
-            const fillM = after.match(/^\.fill\(['"`](.*?)['"`]\)/);
-            if (fillM) {
-                steps.push({ id: nextId(), type: 'type', name: `Type into ${describeLocator(locatorType, selector, options)}`, ...locPatch, value: fillM[1] });
-                continue;
-            }
-            const selM = after.match(/^\.selectOption\(['"`](.*?)['"`]\)/);
-            if (selM) {
-                steps.push({ id: nextId(), type: 'select', name: `Select in ${describeLocator(locatorType, selector, options)}`, ...locPatch, value: selM[1] });
-                continue;
+            if (argsResult) {
+                const { raw: argsRaw, closeIdx } = argsResult;
+                const after = line.slice(closeIdx + 1);
+                const { selector, options } = parseLocatorArgs(argsRaw);
+                const locatorType = METHOD_TO_LOCATOR[methodName] ?? 'css';
+                const locPatch = { selector, locatorType, ...(options ? { locatorOptions: options } : {}) };
+                if (/^\.click\(\s*\)/.test(after)) {
+                    steps.push({ id: nextId(), type: 'click', name: `Click ${describeLocator(locatorType, selector, options)}`, ...locPatch });
+                    continue;
+                }
+                if (/^\.hover\(\s*\)/.test(after)) {
+                    steps.push({ id: nextId(), type: 'hover', name: `Hover ${describeLocator(locatorType, selector, options)}`, ...locPatch });
+                    continue;
+                }
+                const fillM = after.match(/^\.fill\(['"`](.*?)['"`]\)/s);
+                if (fillM) {
+                    steps.push({ id: nextId(), type: 'type', name: `Type into ${describeLocator(locatorType, selector, options)}`, ...locPatch, value: fillM[1] });
+                    continue;
+                }
+                const selM = after.match(/^\.selectOption\((['"`])(.*?)\1\)/s);
+                if (selM) {
+                    steps.push({ id: nextId(), type: 'select', name: `Select in ${describeLocator(locatorType, selector, options)}`, ...locPatch, value: selM[2] });
+                    continue;
+                }
+                // `after` starts with another locator method — falls through to general parser below
             }
         }
         // expect assertions: await expect(page.METHOD(ARGS)).toXxx(...)
         if (line.startsWith('await expect(page.')) {
             const innerPrefixM = LOCATOR_PREFIX_RE.exec(line);
-            if (!innerPrefixM)
-                continue;
-            const innerOpenIdx = (innerPrefixM.index ?? 0) + innerPrefixM[0].length - 1;
-            const innerArgs = scanBalancedArgs(line, innerOpenIdx);
-            if (!innerArgs)
-                continue;
-            const afterLocator = line.slice(innerArgs.closeIdx + 1);
-            const { selector, options } = parseLocatorArgs(innerArgs.raw);
-            const locatorType = METHOD_TO_LOCATOR[innerPrefixM[1]] ?? 'css';
-            const locPatch = { selector, locatorType, ...(options ? { locatorOptions: options } : {}) };
-            const textM = afterLocator.match(/\)\.toContainText\(['"`]([^'"`]+)['"`]\)/);
-            if (textM) {
-                steps.push({ id: nextId(), type: 'assert', assertType: 'containsText', name: `Assert text in ${describeLocator(locatorType, selector, options)}`, ...locPatch, expected: textM[1] });
-                continue;
+            if (innerPrefixM) {
+                const innerOpenIdx = (innerPrefixM.index ?? 0) + innerPrefixM[0].length - 1;
+                const innerArgs = scanBalancedArgs(line, innerOpenIdx);
+                if (innerArgs) {
+                    const afterLocator = line.slice(innerArgs.closeIdx + 1);
+                    const { selector, options } = parseLocatorArgs(innerArgs.raw);
+                    const locatorType = METHOD_TO_LOCATOR[innerPrefixM[1]] ?? 'css';
+                    const locPatch = { selector, locatorType, ...(options ? { locatorOptions: options } : {}) };
+                    const textM = afterLocator.match(/\)\.toContainText\(['"`]([^'"`]+)['"`]\)/);
+                    if (textM) {
+                        steps.push({ id: nextId(), type: 'assert', assertType: 'containsText', name: `Assert text in ${describeLocator(locatorType, selector, options)}`, ...locPatch, expected: textM[1] });
+                        continue;
+                    }
+                    if (afterLocator.includes(').toBeVisible()')) {
+                        steps.push({ id: nextId(), type: 'assert', assertType: 'isVisible', name: `Assert visible ${describeLocator(locatorType, selector, options)}`, ...locPatch, expected: '' });
+                        continue;
+                    }
+                    if (afterLocator.includes(').toBeHidden()')) {
+                        steps.push({ id: nextId(), type: 'assert', assertType: 'isHidden', name: `Assert hidden ${describeLocator(locatorType, selector, options)}`, ...locPatch, expected: '' });
+                        continue;
+                    }
+                }
             }
-            if (afterLocator.includes(').toBeVisible()')) {
-                steps.push({ id: nextId(), type: 'assert', assertType: 'isVisible', name: `Assert visible ${describeLocator(locatorType, selector, options)}`, ...locPatch, expected: '' });
-                continue;
-            }
-            if (afterLocator.includes(').toBeHidden()')) {
-                steps.push({ id: nextId(), type: 'assert', assertType: 'isHidden', name: `Assert hidden ${describeLocator(locatorType, selector, options)}`, ...locPatch, expected: '' });
-                continue;
+            continue; // skip unparsed expect lines
+        }
+        // General fallback: handles chained locators like
+        //   page.locator('x').filter({hasText:'y'}).getByLabel('z').selectOption(...)
+        //   page.getByRole('group').filter({...}).getByLabel('...').click()
+        if (line.startsWith('await ')) {
+            const parsed = splitLocatorAction(line);
+            if (parsed && parsed.locatorExpr.startsWith('page.')) {
+                const { locatorExpr, action, argsRaw } = parsed;
+                const raw_patch = { selector: locatorExpr, locatorType: 'raw' };
+                const label = describeRaw(locatorExpr);
+                const firstArg = extractFirstStringArg(argsRaw);
+                switch (action) {
+                    case 'click':
+                        steps.push({ id: nextId(), type: 'click', name: `Click ${label}`, ...raw_patch });
+                        break;
+                    case 'hover':
+                        steps.push({ id: nextId(), type: 'hover', name: `Hover ${label}`, ...raw_patch });
+                        break;
+                    case 'fill':
+                    case 'pressSequentially':
+                    case 'type':
+                        steps.push({ id: nextId(), type: 'type', name: `Type into ${label}`, ...raw_patch, value: firstArg });
+                        break;
+                    case 'selectOption':
+                        steps.push({ id: nextId(), type: 'select', name: `Select in ${label}`, ...raw_patch, value: firstArg });
+                        break;
+                    case 'check':
+                    case 'uncheck':
+                        steps.push({ id: nextId(), type: 'click', name: `${action === 'check' ? 'Check' : 'Uncheck'} ${label}`, ...raw_patch });
+                        break;
+                }
             }
         }
     }
-    return injectHoverForNavMenus(steps, nextId);
+    // Remove raw-type duplicates: when Playwright codegen records both a chained variant
+    // and a simpler equivalent on the next line, keep only the simpler one.
+    return deduplicateRawSteps(steps);
 }
 /**
- * Post-processing pass that handles hover-triggered mega-menu navigation.
- *
- * Pattern A — codegen recorded a click on the nav trigger (user clicked, not hovered):
- *   click role:link A  →  click role:link B
- *   becomes: hover A + wait(500ms) + click B
- *
- * Pattern B — codegen correctly recorded hover (user hovered without clicking):
- *   hover role:link A  →  click role:link B
- *   becomes: hover A + wait(500ms) + click B
- *
- * The wait gives CSS/JS menu animations time to complete before the sub-item click.
+ * Splits `await LOCATOR_CHAIN.ACTION(ARGS);` into its parts.
+ * Scans at paren-depth 0 to find the LAST known action method.
  */
-function injectHoverForNavMenus(steps, nextId) {
-    const isNavLinkClick = (st) => st.type === 'click' &&
-        st.locatorType === 'role' &&
-        st.selector === 'link';
-    const isNavLinkHover = (st) => st.type === 'hover' &&
-        st.locatorType === 'role' &&
-        st.selector === 'link';
-    const makeWait = () => ({
-        id: nextId(),
-        type: 'wait',
-        name: 'Wait for menu to open',
-        waitType: 'timeout',
-        timeout: 500,
-        onTimeout: 'fail',
-    });
+function splitLocatorAction(line) {
+    const stripped = line.replace(/^await\s+/, '').replace(/;\s*$/, '').trim();
+    const ACTIONS = ['click', 'hover', 'fill', 'selectOption', 'check', 'uncheck',
+        'press', 'dblclick', 'pressSequentially', 'type', 'tap', 'waitFor'];
+    let depth = 0;
+    let inStr = null;
+    let lastDotIdx = -1;
+    let lastAction = '';
+    for (let i = 0; i < stripped.length; i++) {
+        const ch = stripped[i];
+        if (inStr) {
+            if (ch === inStr && stripped[i - 1] !== '\\')
+                inStr = null;
+            continue;
+        }
+        if (ch === '"' || ch === "'" || ch === '`') {
+            inStr = ch;
+            continue;
+        }
+        if (ch === '(') {
+            depth++;
+            continue;
+        }
+        if (ch === ')') {
+            depth--;
+            continue;
+        }
+        if (depth === 0 && ch === '.') {
+            for (const action of ACTIONS) {
+                const end = i + 1 + action.length;
+                if (stripped.slice(i + 1, end) === action && stripped[end] === '(') {
+                    lastDotIdx = i;
+                    lastAction = action;
+                    break;
+                }
+            }
+        }
+    }
+    if (lastDotIdx === -1)
+        return null;
+    const locatorExpr = stripped.slice(0, lastDotIdx);
+    const argsOpenIdx = lastDotIdx + 1 + lastAction.length; // index of '('
+    if (stripped[argsOpenIdx] !== '(')
+        return null;
+    const argsResult = scanBalancedArgs(stripped, argsOpenIdx);
+    if (!argsResult)
+        return null;
+    return { locatorExpr, action: lastAction, argsRaw: argsResult.raw };
+}
+/** Extracts the first string argument from a raw args string, handling JSON-array strings. */
+function extractFirstStringArg(argsRaw) {
+    const t = argsRaw.trim();
+    // String wrapping a JSON array: '["a","b"]' or "['a','b']"
+    const arrayM = t.match(/^(['"`])(\[[\s\S]*\])\1/);
+    if (arrayM)
+        return arrayM[2];
+    // Plain string
+    const strM = t.match(/^(['"`])([\s\S]*?)\1/);
+    if (strM)
+        return strM[2];
+    return t;
+}
+/** Human-readable label for a raw locator expression. */
+function describeRaw(expr) {
+    const getByLabel = expr.match(/\.getByLabel\(['"`]([^'"`]+)['"`]\)\s*$/);
+    if (getByLabel)
+        return `label:"${getByLabel[1]}"`;
+    const getByRole = expr.match(/\.getByRole\(['"`]([^'"`]+)['"`](?:,\s*\{[^}]*name['"`\s:]+['"`]([^'"`]+)['"`][^}]*\})?\)\s*$/);
+    if (getByRole)
+        return getByRole[2] ? `[${getByRole[1]}] "${getByRole[2]}"` : `[${getByRole[1]}]`;
+    const getByText = expr.match(/\.getByText\(['"`]([^'"`]+)['"`]/);
+    if (getByText)
+        return `"${getByText[1]}"`;
+    const getByPlaceholder = expr.match(/\.getByPlaceholder\(['"`]([^'"`]+)['"`]/);
+    if (getByPlaceholder)
+        return `placeholder:"${getByPlaceholder[1]}"`;
+    const locator = expr.match(/\.locator\(['"`]([^'"`]+)['"`]\)\s*$/);
+    if (locator)
+        return locator[1];
+    // Fallback: last meaningful segment
+    return expr.replace(/^page\./, '').slice(0, 50);
+}
+/**
+ * When Playwright codegen emits both a chained variant and a simpler equivalent
+ * on consecutive lines (e.g. getByLabel(...).getByRole(...).click() followed by
+ * getByRole(...).click()), remove the raw-type duplicate and keep the simpler one.
+ */
+function deduplicateRawSteps(steps) {
     const result = [];
     for (let i = 0; i < steps.length; i++) {
-        const s = steps[i];
+        const curr = steps[i];
         const next = steps[i + 1];
-        // Pattern A: click trigger → click sub-item  (user clicked the nav trigger)
-        if (isNavLinkClick(s) && next && isNavLinkClick(next)) {
-            result.push({
-                id: nextId(),
-                type: 'hover',
-                name: s.name.replace(/^Click /, 'Hover '),
-                selector: s.selector,
-                locatorType: s.locatorType,
-                locatorOptions: s.locatorOptions,
-            });
-            result.push(makeWait());
-            // skip the original click (hover replaces it); next click pushes on next iteration
+        // If current is raw-type and the very next step is the same action with a
+        // specific (non-raw) locator type, the raw one is the chained duplicate — skip it.
+        if ('locatorType' in curr && curr.locatorType === 'raw' &&
+            next && next.type === curr.type &&
+            'locatorType' in next && next.locatorType !== 'raw') {
             continue;
         }
-        // Pattern B: hover trigger → click sub-item  (codegen correctly recorded hover)
-        if (isNavLinkHover(s) && next && isNavLinkClick(next)) {
-            result.push(s); // keep the hover as-is
-            result.push(makeWait()); // insert wait before the sub-item click
-            continue;
-        }
-        result.push(s);
+        result.push(curr);
     }
     return result;
 }

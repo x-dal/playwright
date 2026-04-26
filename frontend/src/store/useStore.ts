@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import type {
   TestSuite, Test, Step, TestRun, PageObject, TestDataSet, ExecutionOptions,
-  Issue, TestPlan, TestStrategy, ApiCollection, ApiRequest, Requirement,
+  Issue, TestPlan, TestStrategy, ApiCollection, ApiRequest, Requirement, Project,
 } from '../types';
 import * as api from '../api/client';
 
@@ -12,6 +12,15 @@ function genId(): string {
 }
 
 interface StoreState {
+  // Projects
+  projects: Project[];
+  activeProjectId: string | null;
+  fetchProjects: () => Promise<void>;
+  createProject: (name: string, description?: string) => Promise<Project>;
+  updateProject: (id: string, data: Partial<Project>) => Promise<void>;
+  deleteProject: (id: string) => Promise<void>;
+  setActiveProject: (id: string | null) => void;
+
   // Suites
   suites: TestSuite[];
   suitesLoading: boolean;
@@ -33,7 +42,7 @@ interface StoreState {
   // Actions – Suites
   fetchSuites: () => Promise<void>;
   fetchSuite: (id: string) => Promise<void>;
-  createSuite: (name: string, description?: string) => Promise<TestSuite>;
+  createSuite: (name: string, description?: string, projectId?: string) => Promise<TestSuite>;
   updateSuite: (id: string, partial: Partial<TestSuite>) => Promise<void>;
   deleteSuite: (id: string) => Promise<void>;
   setActiveSuite: (id: string | null) => void;
@@ -70,26 +79,27 @@ interface StoreState {
 
   // UI
   setView: (view: StoreState['activeView']) => void;
+  enterProject: (id: string) => void;
   setSelectedStep: (id: string | null) => void;
   setPaletteFilter: (f: string) => void;
 
   // Issues
   issues: Issue[];
-  fetchIssues: () => Promise<void>;
+  fetchIssues: (projectId?: string) => Promise<void>;
   createIssue: (data: Partial<Issue>) => Promise<Issue>;
   updateIssue: (id: string, data: Partial<Issue>) => Promise<void>;
   deleteIssue: (id: string) => Promise<void>;
 
   // Test Plans
   testPlans: TestPlan[];
-  fetchTestPlans: () => Promise<void>;
+  fetchTestPlans: (projectId?: string) => Promise<void>;
   createTestPlan: (data: Partial<TestPlan>) => Promise<TestPlan>;
   updateTestPlan: (id: string, data: Partial<TestPlan>) => Promise<void>;
   deleteTestPlan: (id: string) => Promise<void>;
 
   // Test Strategies
   testStrategies: TestStrategy[];
-  fetchTestStrategies: () => Promise<void>;
+  fetchTestStrategies: (projectId?: string) => Promise<void>;
   createTestStrategy: (data: Partial<TestStrategy>) => Promise<TestStrategy>;
   updateTestStrategy: (id: string, data: Partial<TestStrategy>) => Promise<void>;
   deleteTestStrategy: (id: string) => Promise<void>;
@@ -97,7 +107,7 @@ interface StoreState {
   // API Collections
   apiCollections: ApiCollection[];
   apiRequests: Record<string, ApiRequest[]>; // collectionId → requests
-  fetchApiCollections: () => Promise<void>;
+  fetchApiCollections: (projectId?: string) => Promise<void>;
   createApiCollection: (data: Partial<ApiCollection>) => Promise<ApiCollection>;
   updateApiCollection: (id: string, data: Partial<ApiCollection>) => Promise<void>;
   deleteApiCollection: (id: string) => Promise<void>;
@@ -108,7 +118,7 @@ interface StoreState {
 
   // Requirements
   requirements: Requirement[];
-  fetchRequirements: () => Promise<void>;
+  fetchRequirements: (projectId?: string) => Promise<void>;
   createRequirement: (data: Partial<Requirement>) => Promise<Requirement>;
   updateRequirement: (id: string, data: Partial<Requirement>) => Promise<void>;
   deleteRequirement: (id: string) => Promise<void>;
@@ -127,6 +137,8 @@ function getActiveSuite(state: StoreState): TestSuite | undefined {
 
 export const useStore = create<StoreState>()(
   immer((set, get) => ({
+    projects: [],
+    activeProjectId: null,
     suites: [],
     suitesLoading: false,
     activeSuiteId: null,
@@ -144,12 +156,41 @@ export const useStore = create<StoreState>()(
     apiRequests: {},
     requirements: [],
 
+    // ─── Projects ─────────────────────────────────────────────────────────────
+
+    fetchProjects: async () => {
+      const projects = await api.getProjects();
+      set(s => { s.projects = projects; });
+    },
+
+    createProject: async (name, description) => {
+      const project = await api.createProject({ name, description });
+      set(s => { s.projects.unshift(project); });
+      return project;
+    },
+
+    updateProject: async (id, data) => {
+      const updated = await api.updateProject(id, data);
+      set(s => { const idx = s.projects.findIndex(x => x.id === id); if (idx >= 0) s.projects[idx] = updated; });
+    },
+
+    deleteProject: async (id) => {
+      await api.deleteProject(id);
+      set(s => {
+        s.projects = s.projects.filter(x => x.id !== id);
+        if (s.activeProjectId === id) s.activeProjectId = null;
+      });
+    },
+
+    setActiveProject: (id) => set(s => { s.activeProjectId = id; }),
+
     // ─── Suites ───────────────────────────────────────────────────────────────
 
     fetchSuites: async () => {
       set(s => { s.suitesLoading = true; });
       try {
-        const suites = await api.getSuites();
+        const projectId = get().activeProjectId ?? undefined;
+        const suites = await api.getSuites(projectId);
         set(s => { s.suites = suites; s.suitesLoading = false; });
       } catch {
         set(s => { s.suitesLoading = false; });
@@ -165,8 +206,9 @@ export const useStore = create<StoreState>()(
       });
     },
 
-    createSuite: async (name, description) => {
-      const suite = await api.createSuite({ name, description });
+    createSuite: async (name, description, projectId) => {
+      const pid = projectId ?? get().activeProjectId ?? undefined;
+      const suite = await api.createSuite({ name, description, projectId: pid });
       set(s => { s.suites.unshift(suite); });
       return suite;
     },
@@ -391,13 +433,21 @@ export const useStore = create<StoreState>()(
     // ─── UI ───────────────────────────────────────────────────────────────────
 
     setView: (view) => set(s => { s.activeView = view; }),
+
+    enterProject: (id) => set(s => {
+      s.activeProjectId = id;
+      s.activeView = 'dashboard';
+      s.activeSuiteId = null;
+      s.activeTestId = null;
+      s.selectedStepId = null;
+    }),
     setSelectedStep: (id) => set(s => { s.selectedStepId = id; }),
     setPaletteFilter: (f) => set(s => { s.paletteFilter = f; }),
 
     // ─── Issues ───────────────────────────────────────────────────────────────
 
-    fetchIssues: async () => {
-      const issues = await api.getIssues();
+    fetchIssues: async (projectId) => {
+      const issues = await api.getIssues(projectId ?? get().activeProjectId ?? undefined);
       set(s => { s.issues = issues; });
     },
 
@@ -419,8 +469,8 @@ export const useStore = create<StoreState>()(
 
     // ─── Test Plans ───────────────────────────────────────────────────────────
 
-    fetchTestPlans: async () => {
-      const plans = await api.getTestPlans();
+    fetchTestPlans: async (projectId) => {
+      const plans = await api.getTestPlans(projectId ?? get().activeProjectId ?? undefined);
       set(s => { s.testPlans = plans; });
     },
 
@@ -442,8 +492,8 @@ export const useStore = create<StoreState>()(
 
     // ─── Test Strategies ──────────────────────────────────────────────────────
 
-    fetchTestStrategies: async () => {
-      const strategies = await api.getTestStrategies();
+    fetchTestStrategies: async (projectId) => {
+      const strategies = await api.getTestStrategies(projectId ?? get().activeProjectId ?? undefined);
       set(s => { s.testStrategies = strategies; });
     },
 
@@ -465,8 +515,8 @@ export const useStore = create<StoreState>()(
 
     // ─── API Collections ──────────────────────────────────────────────────────
 
-    fetchApiCollections: async () => {
-      const cols = await api.getApiCollections();
+    fetchApiCollections: async (projectId) => {
+      const cols = await api.getApiCollections(projectId ?? get().activeProjectId ?? undefined);
       set(s => { s.apiCollections = cols; });
     },
 
@@ -516,8 +566,8 @@ export const useStore = create<StoreState>()(
 
     // ─── Requirements ─────────────────────────────────────────────────────────
 
-    fetchRequirements: async () => {
-      const reqs = await api.getRequirements();
+    fetchRequirements: async (projectId) => {
+      const reqs = await api.getRequirements(projectId ?? get().activeProjectId ?? undefined);
       set(s => { s.requirements = reqs; });
     },
 

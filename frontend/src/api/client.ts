@@ -3,15 +3,27 @@ import type {
   TestSuite, Test, TestRun, Step,
   Issue, TestPlan, TestStrategy,
   ApiCollection, ApiRequest, ApiResponse, Requirement,
+  Project,
 } from '../types';
 
 const api = axios.create({ baseURL: '/api', timeout: 30000 });
 
+// ─── Projects ──────────────────────────────────────────────────────────────────
+
+export const getProjects = () => api.get<Project[]>('/projects').then(r => r.data);
+export const getProject = (id: string) => api.get<Project>(`/projects/${id}`).then(r => r.data);
+export const createProject = (data: { name: string; description?: string }) =>
+  api.post<Project>('/projects', data).then(r => r.data);
+export const updateProject = (id: string, data: Partial<Project>) =>
+  api.put<Project>(`/projects/${id}`, data).then(r => r.data);
+export const deleteProject = (id: string) => api.delete(`/projects/${id}`);
+
 // ─── Suites ────────────────────────────────────────────────────────────────────
 
-export const getSuites = () => api.get<TestSuite[]>('/suites').then(r => r.data);
+export const getSuites = (projectId?: string) =>
+  api.get<TestSuite[]>('/suites', { params: projectId ? { projectId } : {} }).then(r => r.data);
 export const getSuite = (id: string) => api.get<TestSuite>(`/suites/${id}`).then(r => r.data);
-export const createSuite = (data: { name: string; description?: string }) =>
+export const createSuite = (data: { name: string; description?: string; projectId?: string }) =>
   api.post<TestSuite>('/suites', data).then(r => r.data);
 export const updateSuite = (id: string, data: Partial<TestSuite>) =>
   api.put<TestSuite>(`/suites/${id}`, data).then(r => r.data);
@@ -79,7 +91,8 @@ export const getReportUrl = (suiteId: string, runId: string) => `/api/export/${s
 
 // ─── Issues ────────────────────────────────────────────────────────────────────
 
-export const getIssues = () => api.get<Issue[]>('/issues').then(r => r.data);
+export const getIssues = (projectId?: string) =>
+  api.get<Issue[]>('/issues', { params: projectId ? { projectId } : {} }).then(r => r.data);
 export const getIssue = (id: string) => api.get<Issue>(`/issues/${id}`).then(r => r.data);
 export const createIssue = (data: Partial<Issue>) => api.post<Issue>('/issues', data).then(r => r.data);
 export const updateIssue = (id: string, data: Partial<Issue>) => api.put<Issue>(`/issues/${id}`, data).then(r => r.data);
@@ -87,7 +100,8 @@ export const deleteIssue = (id: string) => api.delete(`/issues/${id}`);
 
 // ─── Test Plans ────────────────────────────────────────────────────────────────
 
-export const getTestPlans = () => api.get<TestPlan[]>('/plans').then(r => r.data);
+export const getTestPlans = (projectId?: string) =>
+  api.get<TestPlan[]>('/plans', { params: projectId ? { projectId } : {} }).then(r => r.data);
 export const getTestPlan = (id: string) => api.get<TestPlan>(`/plans/${id}`).then(r => r.data);
 export const createTestPlan = (data: Partial<TestPlan>) => api.post<TestPlan>('/plans', data).then(r => r.data);
 export const updateTestPlan = (id: string, data: Partial<TestPlan>) => api.put<TestPlan>(`/plans/${id}`, data).then(r => r.data);
@@ -98,7 +112,8 @@ export const exportTestPlansUrl = (format: 'json' | 'csv') => `/api/plans/export
 
 // ─── Test Strategies ───────────────────────────────────────────────────────────
 
-export const getTestStrategies = () => api.get<TestStrategy[]>('/strategies').then(r => r.data);
+export const getTestStrategies = (projectId?: string) =>
+  api.get<TestStrategy[]>('/strategies', { params: projectId ? { projectId } : {} }).then(r => r.data);
 export const getTestStrategy = (id: string) => api.get<TestStrategy>(`/strategies/${id}`).then(r => r.data);
 export const createTestStrategy = (data: Partial<TestStrategy>) => api.post<TestStrategy>('/strategies', data).then(r => r.data);
 export const updateTestStrategy = (id: string, data: Partial<TestStrategy>) => api.put<TestStrategy>(`/strategies/${id}`, data).then(r => r.data);
@@ -106,7 +121,8 @@ export const deleteTestStrategy = (id: string) => api.delete(`/strategies/${id}`
 
 // ─── API Collections ───────────────────────────────────────────────────────────
 
-export const getApiCollections = () => api.get<ApiCollection[]>('/collections').then(r => r.data);
+export const getApiCollections = (projectId?: string) =>
+  api.get<ApiCollection[]>('/collections', { params: projectId ? { projectId } : {} }).then(r => r.data);
 export const getApiCollection = (id: string) => api.get<ApiCollection>(`/collections/${id}`).then(r => r.data);
 export const createApiCollection = (data: Partial<ApiCollection>) => api.post<ApiCollection>('/collections', data).then(r => r.data);
 export const updateApiCollection = (id: string, data: Partial<ApiCollection>) => api.put<ApiCollection>(`/collections/${id}`, data).then(r => r.data);
@@ -129,7 +145,8 @@ export const getPostmanExportUrl = (collectionId: string) => `/api/collections/$
 
 // ─── Requirements ──────────────────────────────────────────────────────────────
 
-export const getRequirements = () => api.get<Requirement[]>('/requirements').then(r => r.data);
+export const getRequirements = (projectId?: string) =>
+  api.get<Requirement[]>('/requirements', { params: projectId ? { projectId } : {} }).then(r => r.data);
 export const getRequirement = (id: string) => api.get<Requirement>(`/requirements/${id}`).then(r => r.data);
 export const createRequirement = (data: Partial<Requirement>) => api.post<Requirement>('/requirements', data).then(r => r.data);
 export const updateRequirement = (id: string, data: Partial<Requirement>) => api.put<Requirement>(`/requirements/${id}`, data).then(r => r.data);

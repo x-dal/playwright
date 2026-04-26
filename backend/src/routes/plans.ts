@@ -5,8 +5,8 @@ import type { TestPlan } from '../db/models';
 
 const router = Router();
 
-router.get('/', (_req, res) => {
-  res.json(getAllTestPlans());
+router.get('/', (req, res) => {
+  res.json(getAllTestPlans(req.query.projectId as string | undefined));
 });
 
 router.get('/:id', (req, res) => {
@@ -16,13 +16,14 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { name, objective, scope, entryCriteria, exitCriteria, resources, schedule, associatedSuiteIds } = req.body;
+  const { name, objective, scope, entryCriteria, exitCriteria, resources, schedule, associatedSuiteIds, projectId } = req.body;
   if (!name?.trim()) return res.status(400).json({ error: 'name is required' });
 
   const now = new Date().toISOString();
   const plan: TestPlan = {
     id: uuidv4(),
     name: name.trim(),
+    projectId: projectId ?? undefined,
     objective: objective ?? '',
     scope: scope ?? '',
     entryCriteria: entryCriteria ?? '',
